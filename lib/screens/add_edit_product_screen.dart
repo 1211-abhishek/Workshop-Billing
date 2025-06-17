@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../database/db_helper.dart';
 import '../models/product.dart';
+import '../responsive_layout.dart';
 
 class AddEditProductScreen extends StatefulWidget {
   final Product? product;
@@ -111,29 +112,22 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.product == null ? 'Add Product' : 'Edit Product'),
-        actions: [
-          if (isLoading)
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-              ),
-            )
-          else
-            TextButton(
-              onPressed: _saveProduct,
-              child: const Text('Save'),
-            ),
-        ],
       ),
-      body: Form(
+      body: ResponsiveLayout(
+        mobile: _buildForm(context, padding: 16),
+        tablet: _buildForm(context, padding: 48),
+        desktop: _buildForm(context, padding: 120),
+      ),
+    );
+  }
+
+  Widget _buildForm(BuildContext context, {required double padding}) {
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(padding),
+      child: Form(
         key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Card(
               child: Padding(

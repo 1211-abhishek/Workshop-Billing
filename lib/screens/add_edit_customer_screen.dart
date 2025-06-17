@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../database/db_helper.dart';
 import '../models/customer.dart';
+import '../responsive_layout.dart';
 
 class AddEditCustomerScreen extends StatefulWidget {
   final Customer? customer;
@@ -95,149 +96,150 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.customer == null ? 'Add Customer' : 'Edit Customer'),
-        actions: [
-          if (isLoading)
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-              ),
-            )
-          else
-            TextButton(
-              onPressed: _saveCustomer,
-              child: const Text('Save'),
-            ),
-        ],
       ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Basic Information',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+      body: ResponsiveLayout(
+        mobile: _buildForm(context, padding: 16),
+        tablet: _buildForm(context, padding: 48),
+        desktop: _buildForm(context, padding: 120),
+      ),
+    );
+  }
+
+  Widget _buildForm(BuildContext context, {required double padding}) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(
+          maxWidth: 500,
+          maxHeight: 700,
+        ),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(padding),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Basic Information',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _nameController,
+                          decoration: const InputDecoration(
+                            labelText: 'Customer Name *',
+                            prefixIcon: Icon(Icons.person_rounded),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Please enter customer name';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _contactController,
+                          decoration: const InputDecoration(
+                            labelText: 'Contact Number',
+                            prefixIcon: Icon(Icons.phone_rounded),
+                          ),
+                          keyboardType: TextInputType.phone,
+                          validator: (value) {
+                            if (value != null && value.trim().isNotEmpty) {
+                              if (value.trim().length < 10) {
+                                return 'Please enter valid contact number';
+                              }
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _emailController,
+                          decoration: const InputDecoration(
+                            labelText: 'Email Address',
+                            prefixIcon: Icon(Icons.email_rounded),
+                          ),
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (value) {
+                            if (value != null && value.trim().isNotEmpty) {
+                              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                                return 'Please enter valid email address';
+                              }
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _addressController,
+                          decoration: const InputDecoration(
+                            labelText: 'Address',
+                            prefixIcon: Icon(Icons.location_on_rounded),
+                          ),
+                          maxLines: 3,
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Customer Name *',
-                        prefixIcon: Icon(Icons.person_rounded),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Please enter customer name';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _contactController,
-                      decoration: const InputDecoration(
-                        labelText: 'Contact Number',
-                        prefixIcon: Icon(Icons.phone_rounded),
-                      ),
-                      keyboardType: TextInputType.phone,
-                      validator: (value) {
-                        if (value != null && value.trim().isNotEmpty) {
-                          if (value.trim().length < 10) {
-                            return 'Please enter valid contact number';
-                          }
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _emailController,
-                      decoration: const InputDecoration(
-                        labelText: 'Email Address',
-                        prefixIcon: Icon(Icons.email_rounded),
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value != null && value.trim().isNotEmpty) {
-                          if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                            return 'Please enter valid email address';
-                          }
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _addressController,
-                      decoration: const InputDecoration(
-                        labelText: 'Address',
-                        prefixIcon: Icon(Icons.location_on_rounded),
-                      ),
-                      maxLines: 3,
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Business Information',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                const SizedBox(height: 16),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Business Information',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _gstController,
+                          decoration: const InputDecoration(
+                            labelText: 'GST Number',
+                            prefixIcon: Icon(Icons.business_rounded),
+                            hintText: 'e.g., 22AAAAA0000A1Z5',
+                          ),
+                          textCapitalization: TextCapitalization.characters,
+                          validator: (value) {
+                            if (value != null && value.trim().isNotEmpty) {
+                              if (value.trim().length != 15) {
+                                return 'GST number should be 15 characters';
+                              }
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _remarksController,
+                          decoration: const InputDecoration(
+                            labelText: 'Remarks',
+                            prefixIcon: Icon(Icons.note_rounded),
+                            hintText: 'Any additional notes...',
+                          ),
+                          maxLines: 3,
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _gstController,
-                      decoration: const InputDecoration(
-                        labelText: 'GST Number',
-                        prefixIcon: Icon(Icons.business_rounded),
-                        hintText: 'e.g., 22AAAAA0000A1Z5',
-                      ),
-                      textCapitalization: TextCapitalization.characters,
-                      validator: (value) {
-                        if (value != null && value.trim().isNotEmpty) {
-                          if (value.trim().length != 15) {
-                            return 'GST number should be 15 characters';
-                          }
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _remarksController,
-                      decoration: const InputDecoration(
-                        labelText: 'Remarks',
-                        prefixIcon: Icon(Icons.note_rounded),
-                        hintText: 'Any additional notes...',
-                      ),
-                      maxLines: 3,
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

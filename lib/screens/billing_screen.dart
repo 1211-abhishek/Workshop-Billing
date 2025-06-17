@@ -5,6 +5,7 @@ import '../models/product.dart';
 import '../models/billing_history.dart';
 import '../widgets/billing_item_card.dart';
 import 'pdf_invoice_screen.dart';
+import '../responsive_layout.dart';
 
 class BillingScreen extends StatefulWidget {
   const BillingScreen({super.key});
@@ -160,163 +161,200 @@ class _BillingScreenState extends State<BillingScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Customer Details Section
-          Card(
-            margin: const EdgeInsets.all(16),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Customer Details',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
+      body: ResponsiveLayout(
+        mobile: _buildMobile(context),
+        tablet: _buildTablet(context),
+        desktop: _buildDesktop(context),
+      ),
+    );
+  }
+
+  Widget _buildMobile(BuildContext context) {
+    return Column(
+      children: [
+        _customerDetails(context),
+        _billingItemsWidget(context),
+        _summarySection(context),
+      ],
+    );
+  }
+
+  Widget _buildTablet(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Flexible(flex: 2, child: _customerDetails(context)),
+        Flexible(flex: 4, child: _billingItemsWidget(context)),
+        Flexible(flex: 2, child: _summarySection(context)),
+      ],
+    );
+  }
+
+  Widget _buildDesktop(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Flexible(flex: 2, child: _customerDetails(context)),
+        Flexible(flex: 4, child: _billingItemsWidget(context)),
+        Flexible(flex: 2, child: _summarySection(context)),
+      ],
+    );
+  }
+
+  Widget _customerDetails(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.all(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Customer Details',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: customerNameController,
+              decoration: const InputDecoration(
+                labelText: 'Customer Name',
+                prefixIcon: Icon(Icons.person_rounded),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: customerContactController,
+                    decoration: const InputDecoration(
+                      labelText: 'Contact',
+                      prefixIcon: Icon(Icons.phone_rounded),
                     ),
+                    keyboardType: TextInputType.phone,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: customerAddressController,
+              decoration: const InputDecoration(
+                labelText: 'Address',
+                prefixIcon: Icon(Icons.location_on_rounded),
+              ),
+              maxLines: 2,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _billingItemsWidget(BuildContext context) {
+    return Expanded(
+      child: billingItems.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.shopping_cart_outlined,
+                    size: 64,
+                    color: Colors.grey.shade400,
                   ),
                   const SizedBox(height: 16),
-                  TextField(
-                    controller: customerNameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Customer Name',
-                      prefixIcon: Icon(Icons.person_rounded),
+                  Text(
+                    'No items added',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: Colors.grey.shade600,
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: customerContactController,
-                          decoration: const InputDecoration(
-                            labelText: 'Contact',
-                            prefixIcon: Icon(Icons.phone_rounded),
-                          ),
-                          keyboardType: TextInputType.phone,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: customerAddressController,
-                    decoration: const InputDecoration(
-                      labelText: 'Address',
-                      prefixIcon: Icon(Icons.location_on_rounded),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Tap + to add items to the bill',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.grey.shade500,
                     ),
-                    maxLines: 2,
                   ),
                 ],
               ),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: billingItems.length,
+              itemBuilder: (context, index) {
+                return BillingItemCard(
+                  item: billingItems[index],
+                  availableProducts: availableProducts,
+                  onUpdate: (item) => _updateBillingItem(index, item),
+                  onRemove: () => _removeBillingItem(index),
+                );
+              },
             ),
-          ),
+    );
+  }
 
-          // Billing Items
-          Expanded(
-            child: billingItems.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.shopping_cart_outlined,
-                          size: 64,
-                          color: Colors.grey.shade400,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No items added',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Tap + to add items to the bill',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey.shade500,
-                          ),
-                        ),
-                      ],
+  Widget _summarySection(BuildContext context) {
+    if (billingItems.isEmpty) return const SizedBox.shrink();
+    return Card(
+      margin: const EdgeInsets.all(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: discountController,
+                    decoration: const InputDecoration(
+                      labelText: 'Discount (₹)',
+                      prefixIcon: Icon(Icons.discount_rounded),
                     ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: billingItems.length,
-                    itemBuilder: (context, index) {
-                      return BillingItemCard(
-                        item: billingItems[index],
-                        availableProducts: availableProducts,
-                        onUpdate: (item) => _updateBillingItem(index, item),
-                        onRemove: () => _removeBillingItem(index),
-                      );
-                    },
+                    keyboardType: TextInputType.number,
+                    onChanged: (_) => setState(() {}),
                   ),
-          ),
-
-          // Summary Section
-          if (billingItems.isNotEmpty)
-            Card(
-              margin: const EdgeInsets.all(16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: discountController,
-                            decoration: const InputDecoration(
-                              labelText: 'Discount (₹)',
-                              prefixIcon: Icon(Icons.discount_rounded),
-                            ),
-                            keyboardType: TextInputType.number,
-                            onChanged: (_) => setState(() {}),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: TextField(
-                            controller: taxController,
-                            decoration: const InputDecoration(
-                              labelText: 'Tax (%)',
-                              prefixIcon: Icon(Icons.percent_rounded),
-                            ),
-                            keyboardType: TextInputType.number,
-                            onChanged: (_) => setState(() {}),
-                          ),
-                        ),
-                      ],
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: TextField(
+                    controller: taxController,
+                    decoration: const InputDecoration(
+                      labelText: 'Tax (%)',
+                      prefixIcon: Icon(Icons.percent_rounded),
                     ),
-                    const SizedBox(height: 16),
-                    const Divider(),
-                    _buildSummaryRow('Subtotal', subtotal),
-                    if (discountAmount > 0)
-                      _buildSummaryRow('Discount', -discountAmount),
-                    if (taxAmount > 0)
-                      _buildSummaryRow('Tax', taxAmount),
-                    const Divider(),
-                    _buildSummaryRow('Grand Total', grandTotal, isTotal: true),
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: _generateInvoice,
-                        icon: const Icon(Icons.receipt_long_rounded),
-                        label: const Text('Generate Invoice'),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                        ),
-                      ),
-                    ),
-                  ],
+                    keyboardType: TextInputType.number,
+                    onChanged: (_) => setState(() {}),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            const Divider(),
+            _buildSummaryRow('Subtotal', subtotal),
+            if (discountAmount > 0)
+              _buildSummaryRow('Discount', -discountAmount),
+            if (taxAmount > 0)
+              _buildSummaryRow('Tax', taxAmount),
+            const Divider(),
+            _buildSummaryRow('Grand Total', grandTotal, isTotal: true),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _generateInvoice,
+                icon: const Icon(Icons.receipt_long_rounded),
+                label: const Text('Generate Invoice'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
               ),
             ),
-        ],
+          ],
+        ),
       ),
     );
   }

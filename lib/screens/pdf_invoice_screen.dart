@@ -6,6 +6,7 @@ import 'package:pdf/pdf.dart';
 import 'package:open_filex/open_filex.dart';
 import '../models/billing_history.dart';
 import '../services/pdf_generator.dart';
+import '../responsive_layout.dart';
 
 class PdfInvoiceScreen extends StatefulWidget {
   final BillingHistory billingHistory;
@@ -28,51 +29,74 @@ class _PdfInvoiceScreenState extends State<PdfInvoiceScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Invoice ${widget.billingHistory.invoiceNumber}'),
-        actions: [
+      ),
+      body: ResponsiveLayout(
+        mobile: _buildMobile(context),
+        tablet: _buildTablet(context),
+        desktop: _buildDesktop(context),
+      ),
+    );
+  }
+
+  Widget _buildMobile(BuildContext context) {
+    return _mainContent(context, padding: 16);
+  }
+
+  Widget _buildTablet(BuildContext context) {
+    return _mainContent(context, padding: 48);
+  }
+
+  Widget _buildDesktop(BuildContext context) {
+    return _mainContent(context, padding: 120);
+  }
+
+  Widget _mainContent(BuildContext context, {required double padding}) {
+    return Padding(
+      padding: EdgeInsets.all(padding),
+      child: Column(
+        children: [
           if (isGenerating)
             const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: EdgeInsets.symmetric(vertical: 16),
               child: Center(
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
             )
           else ...[
-            IconButton(
-              icon: const Icon(Icons.download_rounded),
-              onPressed: _saveInvoice,
-              tooltip: 'Save Invoice',
+            Expanded(
+              child: PdfPreview(
+                build: (format) => _generatePdf(format),
+                allowPrinting: true,
+                allowSharing: true,
+                canChangePageFormat: false,
+                canDebug: false,
+              ),
             ),
-            IconButton(
-              icon: const Icon(Icons.share_rounded),
-              onPressed: _shareInvoice,
-              tooltip: 'Share Invoice',
-            ),
-            IconButton(
-              icon: const Icon(Icons.open_in_new_rounded),
-              onPressed: lastSavedPath == null ? null : _openInvoice,
-              tooltip: 'Open PDF',
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (lastSavedPath != null)
+                  ElevatedButton.icon(
+                    onPressed: _openInvoice,
+                    icon: const Icon(Icons.open_in_new_rounded),
+                    label: const Text('Open PDF'),
+                  ),
+                ElevatedButton.icon(
+                  onPressed: _shareInvoice,
+                  icon: const Icon(Icons.share_rounded),
+                  label: const Text('Share Invoice'),
+                ),
+                ElevatedButton.icon(
+                  onPressed: _saveInvoice,
+                  icon: const Icon(Icons.download_rounded),
+                  label: const Text('Save Invoice'),
+                ),
+              ],
             ),
           ],
         ],
       ),
-      body: isGenerating
-          ? const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Generating PDF...'),
-                ],
-              ),
-            )
-          : PdfPreview(
-              build: (format) => _generatePdf(format),
-              allowPrinting: true,
-              allowSharing: true,
-              canChangePageFormat: false,
-              canDebug: false,
-            ),
     );
   }
 

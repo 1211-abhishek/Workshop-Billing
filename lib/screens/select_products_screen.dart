@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../database/db_helper.dart';
 import '../models/product.dart';
 import '../widgets/product_tile.dart';
+import '../responsive_layout.dart';
 
 class SelectProductsScreen extends StatefulWidget {
   const SelectProductsScreen({super.key});
@@ -127,185 +128,173 @@ class _SelectProductsScreenState extends State<SelectProductsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final selectedCount = filteredProducts.where((p) => p.isSelectedForBilling).length;
-    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Select Products for Billing'),
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              switch (value) {
-                case 'select_all':
-                  _selectAllProducts(true);
-                  break;
-                case 'deselect_all':
-                  _selectAllProducts(false);
-                  break;
-              }
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'select_all',
-                child: Row(
-                  children: [
-                    Icon(Icons.select_all_rounded),
-                    SizedBox(width: 8),
-                    Text('Select All'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'deselect_all',
-                child: Row(
-                  children: [
-                    Icon(Icons.deselect_rounded),
-                    SizedBox(width: 8),
-                    Text('Deselect All'),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
+        title: const Text('Select Products'),
       ),
-      body: Column(
-        children: [
-          // Info Card
-          Container(
-            margin: const EdgeInsets.all(16),
-            child: Card(
-              color: Theme.of(context).colorScheme.primaryContainer,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.info_rounded,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '$selectedCount products selected for billing',
-                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              color: Theme.of(context).colorScheme.onPrimaryContainer,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            'Only selected products will appear in the billing screen',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context).colorScheme.onPrimaryContainer,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+      body: ResponsiveLayout(
+        mobile: _buildMobile(context),
+        tablet: _buildTablet(context),
+        desktop: _buildDesktop(context),
+      ),
+    );
+  }
 
-          // Search and Filter Section
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              children: [
-                TextField(
-                  controller: searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search products...',
-                    prefixIcon: const Icon(Icons.search_rounded),
-                    suffixIcon: searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear_rounded),
-                            onPressed: () {
-                              searchController.clear();
-                            },
-                          )
-                        : null,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
+  Widget _buildMobile(BuildContext context) {
+    return _mainContent(context, crossAxisCount: 1);
+  }
+
+  Widget _buildTablet(BuildContext context) {
+    return _mainContent(context, crossAxisCount: 2);
+  }
+
+  Widget _buildDesktop(BuildContext context) {
+    return _mainContent(context, crossAxisCount: 3);
+  }
+
+  Widget _mainContent(BuildContext context, {required int crossAxisCount}) {
+    final selectedCount = filteredProducts.where((p) => p.isSelectedForBilling).length;
+    
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1100),
+        child: Column(
+          children: [
+            // Info Card
+            Container(
+              margin: const EdgeInsets.all(16),
+              child: Card(
+                color: Theme.of(context).colorScheme.primaryContainer,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
                   child: Row(
-                    children: categories.map((category) {
-                      final isSelected = selectedCategory == category;
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: FilterChip(
-                          label: Text(category),
-                          selected: isSelected,
-                          onSelected: (selected) {
-                            setState(() {
-                              selectedCategory = category;
-                            });
-                            _filterProducts();
-                          },
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Products List
-          Expanded(
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : filteredProducts.isEmpty
-                    ? Center(
+                    children: [
+                      Icon(
+                        Icons.info_rounded,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(
-                              Icons.inventory_2_outlined,
-                              size: 64,
-                              color: Colors.grey.shade400,
-                            ),
-                            const SizedBox(height: 16),
                             Text(
-                              products.isEmpty ? 'No products found' : 'No matching products',
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: Colors.grey.shade600,
+                              '$selectedCount products selected for billing',
+                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const SizedBox(height: 8),
                             Text(
-                              products.isEmpty 
-                                  ? 'Add products from inventory management'
-                                  : 'Try adjusting your search or filters',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Colors.grey.shade500,
+                              'Only selected products will appear in the billing screen',
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: Theme.of(context).colorScheme.onPrimaryContainer,
                               ),
                             ),
                           ],
                         ),
-                      )
-                    : ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: filteredProducts.length,
-                        itemBuilder: (context, index) {
-                          final product = filteredProducts[index];
-                          return ProductTile(
-                            product: product,
-                            showSelectionToggle: true,
-                            onToggleSelection: () => _toggleProductSelection(product),
-                          );
-                        },
                       ),
-          ),
-        ],
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // Search and Filter Section
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                children: [
+                  TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search products...',
+                      prefixIcon: const Icon(Icons.search_rounded),
+                      suffixIcon: searchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear_rounded),
+                              onPressed: () {
+                                searchController.clear();
+                              },
+                            )
+                          : null,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: categories.map((category) {
+                        final isSelected = selectedCategory == category;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: FilterChip(
+                            label: Text(category),
+                            selected: isSelected,
+                            onSelected: (selected) {
+                              setState(() {
+                                selectedCategory = category;
+                              });
+                              _filterProducts();
+                            },
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Products Grid
+            Expanded(
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : filteredProducts.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.inventory_2_outlined,
+                                size: 64,
+                                color: Colors.grey.shade400,
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                products.isEmpty ? 'No products found' : 'No matching products',
+                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                products.isEmpty 
+                                    ? 'Add products from inventory management'
+                                    : 'Try adjusting your search or filters',
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: Colors.grey.shade500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : GridView.count(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          crossAxisCount: crossAxisCount,
+                          children: filteredProducts.map((product) {
+                            return ProductTile(
+                              product: product,
+                              showSelectionToggle: true,
+                              onToggleSelection: () => _toggleProductSelection(product),
+                            );
+                          }).toList(),
+                        ),
+            ),
+          ],
+        ),
       ),
     );
   }

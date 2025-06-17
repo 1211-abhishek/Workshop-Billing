@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../database/db_helper.dart';
 import '../models/billing_history.dart';
 import 'pdf_invoice_screen.dart';
+import '../responsive_layout.dart';
 
 class BillingHistoryScreen extends StatefulWidget {
   const BillingHistoryScreen({super.key});
@@ -98,230 +99,242 @@ class _BillingHistoryScreenState extends State<BillingHistoryScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Billing History'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.date_range_rounded),
-            onPressed: _selectDateRange,
-            tooltip: 'Filter by Date',
-          ),
-        ],
       ),
-      body: Column(
-        children: [
-          // Summary Card
-          if (filteredHistory.isNotEmpty)
-            Container(
-              margin: const EdgeInsets.all(16),
-              child: Card(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Total Bills',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onPrimaryContainer,
-                            ),
-                          ),
-                          Text(
-                            '${filteredHistory.length}',
-                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              color: Theme.of(context).colorScheme.onPrimaryContainer,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            'Total Revenue',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onPrimaryContainer,
-                            ),
-                          ),
-                          Text(
-                            '₹${totalRevenue.toStringAsFixed(2)}',
-                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              color: Theme.of(context).colorScheme.onPrimaryContainer,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+      body: ResponsiveLayout(
+        mobile: _buildMobile(context),
+        tablet: _buildTablet(context),
+        desktop: _buildDesktop(context),
+      ),
+    );
+  }
 
-          // Search and Filter Section
+  Widget _buildMobile(BuildContext context) {
+    return _mainContent(context, crossAxisCount: 1);
+  }
+
+  Widget _buildTablet(BuildContext context) {
+    return _mainContent(context, crossAxisCount: 2);
+  }
+
+  Widget _buildDesktop(BuildContext context) {
+    return _mainContent(context, crossAxisCount: 3);
+  }
+
+  Widget _mainContent(BuildContext context, {required int crossAxisCount}) {
+    return Column(
+      children: [
+        // Summary Card
+        if (filteredHistory.isNotEmpty)
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              children: [
-                TextField(
-                  controller: searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search by invoice, customer...',
-                    prefixIcon: const Icon(Icons.search_rounded),
-                    suffixIcon: searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear_rounded),
-                            onPressed: () {
-                              searchController.clear();
-                            },
-                          )
-                        : null,
-                  ),
-                ),
-                if (selectedDateRange != null) ...[
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.secondaryContainer,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+            margin: const EdgeInsets.all(16),
+            child: Card(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          Icons.date_range_rounded,
-                          size: 16,
-                          color: Theme.of(context).colorScheme.onSecondaryContainer,
-                        ),
-                        const SizedBox(width: 4),
                         Text(
-                          '${DateFormat('MMM dd').format(selectedDateRange!.start)} - ${DateFormat('MMM dd, yyyy').format(selectedDateRange!.end)}',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSecondaryContainer,
-                            fontSize: 12,
+                          'Total Bills',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.onPrimaryContainer,
                           ),
                         ),
-                        const SizedBox(width: 4),
-                        GestureDetector(
-                          onTap: _clearDateFilter,
-                          child: Icon(
-                            Icons.close_rounded,
-                            size: 16,
-                            color: Theme.of(context).colorScheme.onSecondaryContainer,
+                        Text(
+                          '${filteredHistory.length}',
+                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onPrimaryContainer,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ],
-              ],
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          'Total Revenue',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.onPrimaryContainer,
+                          ),
+                        ),
+                        Text(
+                          '₹${totalRevenue.toStringAsFixed(2)}',
+                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onPrimaryContainer,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
 
-          const SizedBox(height: 16),
-
-          // History List
-          Expanded(
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : filteredHistory.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.history_rounded,
-                              size: 64,
-                              color: Colors.grey.shade400,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              billingHistory.isEmpty ? 'No billing history' : 'No matching records',
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: Colors.grey.shade600,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              billingHistory.isEmpty 
-                                  ? 'Create your first bill to see history'
-                                  : 'Try adjusting your search or date filter',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Colors.grey.shade500,
-                              ),
-                            ),
-                          ],
+        // Search and Filter Section
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            children: [
+              TextField(
+                controller: searchController,
+                decoration: InputDecoration(
+                  hintText: 'Search by invoice, customer...',
+                  prefixIcon: const Icon(Icons.search_rounded),
+                  suffixIcon: searchController.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear_rounded),
+                          onPressed: () {
+                            searchController.clear();
+                          },
+                        )
+                      : null,
+                ),
+              ),
+              if (selectedDateRange != null) ...[
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.secondaryContainer,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.date_range_rounded,
+                        size: 16,
+                        color: Theme.of(context).colorScheme.onSecondaryContainer,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${DateFormat('MMM dd').format(selectedDateRange!.start)} - ${DateFormat('MMM dd, yyyy').format(selectedDateRange!.end)}',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSecondaryContainer,
+                          fontSize: 12,
                         ),
-                      )
-                    : ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: filteredHistory.length,
-                        itemBuilder: (context, index) {
-                          final billing = filteredHistory[index];
-                          return Card(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.all(16),
-                              leading: Container(
-                                width: 50,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Icon(
-                                  Icons.receipt_long_rounded,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
+                      ),
+                      const SizedBox(width: 4),
+                      GestureDetector(
+                        onTap: _clearDateFilter,
+                        child: Icon(
+                          Icons.close_rounded,
+                          size: 16,
+                          color: Theme.of(context).colorScheme.onSecondaryContainer,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 16),
+
+        // History List
+        Expanded(
+          child: isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : filteredHistory.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.history_rounded,
+                            size: 64,
+                            color: Colors.grey.shade400,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            billingHistory.isEmpty ? 'No billing history' : 'No matching records',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            billingHistory.isEmpty 
+                                ? 'Create your first bill to see history'
+                                : 'Try adjusting your search or date filter',
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Colors.grey.shade500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : GridView.count(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      crossAxisCount: crossAxisCount,
+                      children: filteredHistory.map((billing) {
+                        return Card(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.all(16),
+                            leading: Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                              title: Text(
-                                billing.invoiceNumber,
-                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              child: Icon(
+                                Icons.receipt_long_rounded,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const SizedBox(height: 4),
-                                  Text(DateFormat('MMM dd, yyyy - hh:mm a').format(billing.date)),
-                                  if (billing.customerName != null) ...[
-                                    const SizedBox(height: 2),
-                                    Text('Customer: ${billing.customerName}'),
-                                  ],
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '₹${billing.totalAmount.toStringAsFixed(2)}',
-                                    style: TextStyle(
-                                      color: Theme.of(context).colorScheme.primary,
-                                      fontWeight: FontWeight.bold,
+                            ),
+                            title: Text(
+                              billing.invoiceNumber,
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 4),
+                                Text(DateFormat('MMM dd, yyyy - hh:mm a').format(billing.date)),
+                                if (billing.customerName != null) ...[
+                                  const SizedBox(height: 2),
+                                  Text('Customer: ${billing.customerName}'),
+                                ],
+                                const SizedBox(height: 4),
+                                Text(
+                                  '₹${billing.totalAmount.toStringAsFixed(2)}',
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.primary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.visibility_rounded),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PdfInvoiceScreen(
+                                      billingHistory: billing,
                                     ),
                                   ),
-                                ],
-                              ),
-                              trailing: IconButton(
-                                icon: const Icon(Icons.visibility_rounded),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => PdfInvoiceScreen(
-                                        billingHistory: billing,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                tooltip: 'View Invoice',
-                              ),
+                                );
+                              },
+                              tooltip: 'View Invoice',
                             ),
-                          );
-                        },
-                      ),
-          ),
-        ],
-      ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+        ),
+      ],
     );
   }
 
