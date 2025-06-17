@@ -37,6 +37,12 @@ class _BillingScreenState extends State<BillingScreen> {
       if (!mounted) return;
       setState(() {
         availableProducts = products;
+        // Initialize billingItems with all products, quantity 0
+        billingItems = products.map((product) => BillingItemData(
+          product: product,
+          quantity: 0,
+          unitPrice: product.sellingPrice,
+        )).toList();
         isLoading = false;
       });
     } catch (e) {
@@ -50,24 +56,6 @@ class _BillingScreenState extends State<BillingScreen> {
         );
       }
     }
-  }
-
-  void _addBillingItem() {
-    if (availableProducts.isEmpty) return;
-    
-    setState(() {
-      billingItems.add(BillingItemData(
-        product: availableProducts.first,
-        quantity: 1,
-        unitPrice: availableProducts.first.sellingPrice,
-      ));
-    });
-  }
-
-  void _removeBillingItem(int index) {
-    setState(() {
-      billingItems.removeAt(index);
-    });
   }
 
   void _updateBillingItem(int index, BillingItemData item) {
@@ -154,13 +142,7 @@ class _BillingScreenState extends State<BillingScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create Bill'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add_rounded),
-            onPressed: availableProducts.isNotEmpty ? _addBillingItem : null,
-            tooltip: 'Add Item',
-          ),
-        ],
+        // Removed Add Item button
       ),
       body: ResponsiveLayout(
         mobile: _buildMobile(context),
@@ -268,16 +250,9 @@ class _BillingScreenState extends State<BillingScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No items added',
+                    'No products available',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: Colors.grey.shade600,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Tap + to add items to the bill',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.grey.shade500,
                     ),
                   ),
                 ],
@@ -291,7 +266,7 @@ class _BillingScreenState extends State<BillingScreen> {
                   item: billingItems[index],
                   availableProducts: availableProducts,
                   onUpdate: (item) => _updateBillingItem(index, item),
-                  onRemove: () => _removeBillingItem(index),
+                  onRemove: () {}, // Remove delete button functionality
                 );
               },
             ),

@@ -28,29 +28,17 @@ class BillingItemCard extends StatelessWidget {
               children: [
                 Expanded(
                   flex: 3,
-                  child: DropdownButtonFormField<Product>(
-                    value: item.product,
+                  child: TextFormField(
+                    initialValue: item.product.name,
+                    enabled: false,
+                    style: const TextStyle(
+                      color: Colors.black
+                    ),
                     decoration: const InputDecoration(
                       labelText: 'Product',
+                      
                       contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     ),
-                    items: availableProducts.map((product) {
-                      return DropdownMenuItem(
-                        value: product,
-                        child: Text(
-                          product.name,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (product) {
-                      if (product != null) {
-                        onUpdate(item.copyWith(
-                          product: product,
-                          unitPrice: product.sellingPrice,
-                        ));
-                      }
-                    },
                   ),
                 ),
                 const SizedBox(width: 8),
