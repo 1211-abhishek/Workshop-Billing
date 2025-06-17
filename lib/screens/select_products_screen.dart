@@ -33,11 +33,12 @@ class _SelectProductsScreenState extends State<SelectProductsScreen> {
 
     try {
       final loadedProducts = await DatabaseHelper.instance.getAllProducts();
-      final productCategories = loadedProducts
-          .map((p) => p.category ?? 'Uncategorized')
-          .toSet()
-          .toList();
-      
+      final productCategories =
+          loadedProducts
+              .map((p) => p.category ?? 'Uncategorized')
+              .toSet()
+              .toList();
+
       setState(() {
         products = loadedProducts;
         filteredProducts = loadedProducts;
@@ -49,9 +50,9 @@ class _SelectProductsScreenState extends State<SelectProductsScreen> {
         isLoading = false;
       });
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading products: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error loading products: $e')));
       }
     }
   }
@@ -59,13 +60,16 @@ class _SelectProductsScreenState extends State<SelectProductsScreen> {
   void _filterProducts() {
     final query = searchController.text.toLowerCase();
     setState(() {
-      filteredProducts = products.where((product) {
-        final matchesSearch = product.name.toLowerCase().contains(query) ||
-            (product.description?.toLowerCase().contains(query) ?? false);
-        final matchesCategory = selectedCategory == 'All' ||
-            (product.category ?? 'Uncategorized') == selectedCategory;
-        return matchesSearch && matchesCategory;
-      }).toList();
+      filteredProducts =
+          products.where((product) {
+            final matchesSearch =
+                product.name.toLowerCase().contains(query) ||
+                (product.description?.toLowerCase().contains(query) ?? false);
+            final matchesCategory =
+                selectedCategory == 'All' ||
+                (product.category ?? 'Uncategorized') == selectedCategory;
+            return matchesSearch && matchesCategory;
+          }).toList();
     });
   }
 
@@ -74,10 +78,10 @@ class _SelectProductsScreenState extends State<SelectProductsScreen> {
       final updatedProduct = product.copyWith(
         isSelectedForBilling: !product.isSelectedForBilling,
       );
-      
+
       await DatabaseHelper.instance.updateProduct(updatedProduct);
       _loadProducts();
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -91,9 +95,9 @@ class _SelectProductsScreenState extends State<SelectProductsScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error updating product: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error updating product: $e')));
       }
     }
   }
@@ -107,21 +111,23 @@ class _SelectProductsScreenState extends State<SelectProductsScreen> {
         }
       }
       _loadProducts();
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              select ? 'All products selected for billing' : 'All products deselected',
+              select
+                  ? 'All products selected for billing'
+                  : 'All products deselected',
             ),
           ),
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error updating products: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error updating products: $e')));
       }
     }
   }
@@ -129,9 +135,7 @@ class _SelectProductsScreenState extends State<SelectProductsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Select Products'),
-      ),
+      appBar: AppBar(title: const Text('Select Products')),
       body: ResponsiveLayout(
         mobile: _buildMobile(context),
         tablet: _buildTablet(context),
@@ -153,8 +157,9 @@ class _SelectProductsScreenState extends State<SelectProductsScreen> {
   }
 
   Widget _mainContent(BuildContext context, {required int crossAxisCount}) {
-    final selectedCount = filteredProducts.where((p) => p.isSelectedForBilling).length;
-    
+    final selectedCount =
+        filteredProducts.where((p) => p.isSelectedForBilling).length;
+
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 1100),
@@ -180,15 +185,25 @@ class _SelectProductsScreenState extends State<SelectProductsScreen> {
                           children: [
                             Text(
                               '$selectedCount products selected for billing',
-                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                              style: Theme.of(
+                                context,
+                              ).textTheme.titleSmall?.copyWith(
+                                color:
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimaryContainer,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
                               'Only selected products will appear in the billing screen',
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodySmall?.copyWith(
+                                color:
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimaryContainer,
                               ),
                             ),
                           ],
@@ -210,36 +225,38 @@ class _SelectProductsScreenState extends State<SelectProductsScreen> {
                     decoration: InputDecoration(
                       hintText: 'Search products...',
                       prefixIcon: const Icon(Icons.search_rounded),
-                      suffixIcon: searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear_rounded),
-                              onPressed: () {
-                                searchController.clear();
-                              },
-                            )
-                          : null,
+                      suffixIcon:
+                          searchController.text.isNotEmpty
+                              ? IconButton(
+                                icon: const Icon(Icons.clear_rounded),
+                                onPressed: () {
+                                  searchController.clear();
+                                },
+                              )
+                              : null,
                     ),
                   ),
                   const SizedBox(height: 12),
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
-                      children: categories.map((category) {
-                        final isSelected = selectedCategory == category;
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: FilterChip(
-                            label: Text(category),
-                            selected: isSelected,
-                            onSelected: (selected) {
-                              setState(() {
-                                selectedCategory = category;
-                              });
-                              _filterProducts();
-                            },
-                          ),
-                        );
-                      }).toList(),
+                      children:
+                          categories.map((category) {
+                            final isSelected = selectedCategory == category;
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: FilterChip(
+                                label: Text(category),
+                                selected: isSelected,
+                                onSelected: (selected) {
+                                  setState(() {
+                                    selectedCategory = category;
+                                  });
+                                  _filterProducts();
+                                },
+                              ),
+                            );
+                          }).toList(),
                     ),
                   ),
                 ],
@@ -250,48 +267,57 @@ class _SelectProductsScreenState extends State<SelectProductsScreen> {
 
             // Products Grid
             Expanded(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : filteredProducts.isEmpty
+              child:
+                  isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : filteredProducts.isEmpty
                       ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.inventory_2_outlined,
-                                size: 64,
-                                color: Colors.grey.shade400,
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                products.isEmpty ? 'No products found' : 'No matching products',
-                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: Colors.grey.shade600,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                products.isEmpty 
-                                    ? 'Add products from inventory management'
-                                    : 'Try adjusting your search or filters',
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Colors.grey.shade500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      : GridView.count(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          crossAxisCount: crossAxisCount,
-                          children: filteredProducts.map((product) {
-                            return ProductTile(
-                              product: product,
-                              showSelectionToggle: true,
-                              onToggleSelection: () => _toggleProductSelection(product),
-                            );
-                          }).toList(),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.inventory_2_outlined,
+                              size: 64,
+                              color: Colors.grey.shade400,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              products.isEmpty
+                                  ? 'No products found'
+                                  : 'No matching products',
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(color: Colors.grey.shade600),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              products.isEmpty
+                                  ? 'Add products from inventory management'
+                                  : 'Try adjusting your search or filters',
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(color: Colors.grey.shade500),
+                            ),
+                          ],
                         ),
+                      )
+                      : GridView.count(
+                        childAspectRatio: 3,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        crossAxisCount: crossAxisCount,
+                        mainAxisSpacing: 12,
+                        crossAxisSpacing: 12,
+                        children:
+                            filteredProducts.map((product) {
+                              return ProductTile(
+                                product: product,
+                                showSelectionToggle: true,
+                                onToggleSelection:
+                                    () => _toggleProductSelection(product),
+                              );
+                            }).toList(),
+                      ),
             ),
           ],
         ),

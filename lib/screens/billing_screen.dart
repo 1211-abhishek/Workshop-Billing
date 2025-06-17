@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_billing_system/screens/bill_preview_screen.dart';
 import 'package:intl/intl.dart';
 import '../database/db_helper.dart';
 import '../models/product.dart';
@@ -129,7 +130,7 @@ class _BillingScreenState extends State<BillingScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => PdfInvoiceScreen(
+          builder: (context) => BillPreviewScreen(
             billingHistory: billingHistory,
           ),
         ),
