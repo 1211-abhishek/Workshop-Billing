@@ -74,7 +74,18 @@ class DatabaseHelper {
         customerName TEXT,
         customerContact TEXT,
         customerAddress TEXT,
-        remarks TEXT
+        remarks TEXT,
+        engineType TEXT,
+        pump TEXT,
+        serialNumber TEXT UNIQUE,
+        governor TEXT,
+        feedPump TEXT,
+        noozelHolder TEXT,
+        vehicleNumber TEXT,
+        mechanicName TEXT,
+        arrivedDate TEXT,
+        deliveredDate TEXT,
+        billingDate TEXT
       )
     ''');
 
@@ -266,6 +277,22 @@ class DatabaseHelper {
     final invoiceNumber = '$datePrefix${nextSeq.toString().padLeft(3, '0')}';
     print('[DB] Generated invoice number: $invoiceNumber');
     return invoiceNumber;
+  }
+
+  Future<int> getNextSerialNumber() async {
+    final db = await instance.database;
+    final result = await db.rawQuery('SELECT MAX(CAST(serialNumber AS INTEGER)) as maxSerial FROM billing_history');
+    int nextSerial = 1;
+    if (result.isNotEmpty && result.first['maxSerial'] != null) {
+      final lastSerial = int.tryParse(result.first['maxSerial'].toString()) ?? 0;
+      nextSerial = lastSerial + 1;
+    }
+    return nextSerial;
+  }
+
+  Future<List<Map<String, dynamic>>> debugGetAllBills() async {
+    final db = await instance.database;
+    return await db.query('billing_history', orderBy: 'id DESC');
   }
 
   Future close() async {

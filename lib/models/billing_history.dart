@@ -13,6 +13,17 @@ class BillingHistory {
   final String? customerAddress;
   final String? remarks;
   final List<BillingItem> items;
+  final String? engineType;
+  final String? pump;
+  final String? serialNumber;
+  final String? governor;
+  final String? feedPump;
+  final String? noozelHolder;
+  final String? vehicleNumber;
+  final String? mechanicName;
+  final DateTime? arrivedDate;
+  final DateTime? deliveredDate;
+  final DateTime? billingDate;
 
   BillingHistory({
     this.id,
@@ -27,6 +38,17 @@ class BillingHistory {
     this.customerAddress,
     this.remarks,
     this.items = const [],
+    this.engineType,
+    this.pump,
+    this.serialNumber,
+    this.governor,
+    this.feedPump,
+    this.noozelHolder,
+    this.vehicleNumber,
+    this.mechanicName,
+    this.arrivedDate,
+    this.deliveredDate,
+    this.billingDate,
   });
 
   Map<String, dynamic> toMap() {
@@ -42,6 +64,17 @@ class BillingHistory {
       'customerContact': customerContact,
       'customerAddress': customerAddress,
       'remarks': remarks,
+      'engineType': engineType,
+      'pump': pump,
+      'serialNumber': serialNumber,
+      'governor': governor,
+      'feedPump': feedPump,
+      'noozelHolder': noozelHolder,
+      'vehicleNumber': vehicleNumber,
+      'mechanicName': mechanicName,
+      'arrivedDate': arrivedDate?.toIso8601String(),
+      'deliveredDate': deliveredDate?.toIso8601String(),
+      'billingDate': billingDate?.toIso8601String(),
     };
   }
 
@@ -58,6 +91,17 @@ class BillingHistory {
       customerContact: map['customerContact'],
       customerAddress: map['customerAddress'],
       remarks: map['remarks'],
+      engineType: map['engineType'],
+      pump: map['pump'],
+      serialNumber: map['serialNumber'],
+      governor: map['governor'],
+      feedPump: map['feedPump'],
+      noozelHolder: map['noozelHolder'],
+      vehicleNumber: map['vehicleNumber'],
+      mechanicName: map['mechanicName'],
+      arrivedDate: map['arrivedDate'] != null ? DateTime.tryParse(map['arrivedDate']) : null,
+      deliveredDate: map['deliveredDate'] != null ? DateTime.tryParse(map['deliveredDate']) : null,
+      billingDate: map['billingDate'] != null ? DateTime.tryParse(map['billingDate']) : null,
     );
   }
 }

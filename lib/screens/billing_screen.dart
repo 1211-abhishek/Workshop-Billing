@@ -23,12 +23,28 @@ class _BillingScreenState extends State<BillingScreen> {
   final TextEditingController customerAddressController = TextEditingController();
   final TextEditingController discountController = TextEditingController(text: '0');
   final TextEditingController taxController = TextEditingController(text: '0');
+  final TextEditingController engineTypeController = TextEditingController();
+  final TextEditingController pumpController = TextEditingController();
+  final TextEditingController serialNumberController = TextEditingController();
+  final TextEditingController governorController = TextEditingController();
+  final TextEditingController feedPumpController = TextEditingController();
+  final TextEditingController noozelHolderController = TextEditingController();
+  final TextEditingController vehicleNumberController = TextEditingController();
+  final TextEditingController mechanicNameController = TextEditingController();
+  final TextEditingController pumpLabourController = TextEditingController(text: '0');
+  final TextEditingController nozzleLabourController = TextEditingController(text: '0');
+  final TextEditingController otherChargesController = TextEditingController(text: '0');
+  DateTime? arrivedDate;
+  DateTime? deliveredDate;
+  DateTime? billingDate;
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _loadProducts();
+    _setSerialNumber();
+    _debugPrintBills();
   }
 
   Future<void> _loadProducts() async {
@@ -58,6 +74,13 @@ class _BillingScreenState extends State<BillingScreen> {
     }
   }
 
+  Future<void> _setSerialNumber() async {
+    final nextSerial = await DatabaseHelper.instance.getNextSerialNumber();
+    setState(() {
+      serialNumberController.text = nextSerial.toString();
+    });
+  }
+
   void _updateBillingItem(int index, BillingItemData item) {
     setState(() {
       billingItems[index] = item;
@@ -77,8 +100,12 @@ class _BillingScreenState extends State<BillingScreen> {
     return (subtotal - discountAmount) * taxPercent / 100;
   }
 
+  double get pumpLabourCharge => double.tryParse(pumpLabourController.text) ?? 0.0;
+  double get nozzleLabourCharge => double.tryParse(nozzleLabourController.text) ?? 0.0;
+  double get otherCharges => double.tryParse(otherChargesController.text) ?? 0.0;
+
   double get grandTotal {
-    return subtotal - discountAmount + taxAmount;
+    return subtotal - discountAmount + taxAmount + pumpLabourCharge + nozzleLabourCharge + otherCharges;
   }
 
   Future<void> _generateInvoice() async {
@@ -92,17 +119,29 @@ class _BillingScreenState extends State<BillingScreen> {
 
     try {
       final invoiceNumber = await DatabaseHelper.instance.generateInvoiceNumber();
-      
+      // Only include items with quantity > 0
+      final filteredBillingItems = billingItems.where((item) => item.quantity > 0).toList();
       final billingHistory = BillingHistory(
         invoiceNumber: invoiceNumber,
         date: DateTime.now(),
-        totalAmount: grandTotal,
+        totalAmount: filteredBillingItems.fold(0.0, (sum, item) => sum + item.totalPrice) - discountAmount + taxAmount,
         taxAmount: taxAmount,
         discountAmount: discountAmount,
         customerName: customerNameController.text.isEmpty ? null : customerNameController.text,
         customerContact: customerContactController.text.isEmpty ? null : customerContactController.text,
         customerAddress: customerAddressController.text.isEmpty ? null : customerAddressController.text,
-        items: billingItems.map((item) => BillingItem(
+        engineType: engineTypeController.text.isEmpty ? null : engineTypeController.text,
+        pump: pumpController.text.isEmpty ? null : pumpController.text,
+        serialNumber: serialNumberController.text,
+        governor: governorController.text.isEmpty ? null : governorController.text,
+        feedPump: feedPumpController.text.isEmpty ? null : feedPumpController.text,
+        noozelHolder: noozelHolderController.text.isEmpty ? null : noozelHolderController.text,
+        vehicleNumber: vehicleNumberController.text.isEmpty ? null : vehicleNumberController.text,
+        mechanicName: mechanicNameController.text.isEmpty ? null : mechanicNameController.text,
+        arrivedDate: arrivedDate,
+        deliveredDate: deliveredDate,
+        billingDate: billingDate,
+        items: filteredBillingItems.map((item) => BillingItem(
           billingHistoryId: 0, // Will be set by database
           productName: item.product.name,
           quantity: item.quantity,
@@ -113,6 +152,7 @@ class _BillingScreenState extends State<BillingScreen> {
       );
 
       await DatabaseHelper.instance.insertBillingHistory(billingHistory);
+      await _setSerialNumber(); // increment for next bill
 
       if (!mounted) return;
       Navigator.push(
@@ -131,6 +171,14 @@ class _BillingScreenState extends State<BillingScreen> {
     }
   }
 
+  Future<void> _debugPrintBills() async {
+    final bills = await DatabaseHelper.instance.debugGetAllBills();
+    print('[DEBUG] All bills in DB:');
+    for (final bill in bills) {
+      print(bill);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
@@ -142,134 +190,359 @@ class _BillingScreenState extends State<BillingScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create Bill'),
-        // Removed Add Item button
       ),
-      body: ResponsiveLayout(
-        mobile: _buildMobile(context),
-        tablet: _buildTablet(context),
-        desktop: _buildDesktop(context),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: Colors.grey[100], // Subtle background
+        child: ResponsiveLayout(
+          mobile: _buildMobile(context),
+          tablet: _buildTablet(context),
+          desktop: _buildDesktop(context),
+        ),
       ),
     );
   }
 
   Widget _buildMobile(BuildContext context) {
-    return Column(
-      children: [
-        _customerDetails(context),
-        _billingItemsWidget(context),
-        _summarySection(context),
-      ],
-    );
-  }
-
-  Widget _buildTablet(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Flexible(flex: 2, child: _customerDetails(context)),
-        Flexible(flex: 4, child: _billingItemsWidget(context)),
-        Flexible(flex: 2, child: _summarySection(context)),
-      ],
-    );
-  }
-
-  Widget _buildDesktop(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Flexible(flex: 2, child: _customerDetails(context)),
-        Flexible(flex: 4, child: _billingItemsWidget(context)),
-        Flexible(flex: 2, child: _summarySection(context)),
-      ],
-    );
-  }
-
-  Widget _customerDetails(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.all(16),
+    return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Customer Details',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: customerNameController,
-              decoration: const InputDecoration(
-                labelText: 'Customer Name',
-                prefixIcon: Icon(Icons.person_rounded),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: customerContactController,
-                    decoration: const InputDecoration(
-                      labelText: 'Contact',
-                      prefixIcon: Icon(Icons.phone_rounded),
-                    ),
-                    keyboardType: TextInputType.phone,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: customerAddressController,
-              decoration: const InputDecoration(
-                labelText: 'Address',
-                prefixIcon: Icon(Icons.location_on_rounded),
-              ),
-              maxLines: 2,
-            ),
+            _headerBanner(context),
+            _customerDetails(context),
+            _billingItemsWidget(context, isMobile: true),
+            _summarySection(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _billingItemsWidget(BuildContext context) {
-    return Expanded(
-      child: billingItems.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.shopping_cart_outlined,
-                    size: 64,
-                    color: Colors.grey.shade400,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No products available',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                ],
-              ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: billingItems.length,
-              itemBuilder: (context, index) {
-                return BillingItemCard(
-                  item: billingItems[index],
-                  availableProducts: availableProducts,
-                  onUpdate: (item) => _updateBillingItem(index, item),
-                  onRemove: () {}, // Remove delete button functionality
-                );
-              },
+  Widget _buildTablet(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1100),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Flexible(flex: 2, child: _customerDetails(context)),
+            const SizedBox(width: 16),
+            Flexible(flex: 4, child: _billingItemsWidget(context)),
+            const SizedBox(width: 16),
+            Flexible(flex: 2, child: _summarySection(context)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDesktop(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1300),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Flexible(flex: 2, child: _customerDetails(context)),
+            const SizedBox(width: 24),
+            Flexible(flex: 4, child: _billingItemsWidget(context)),
+            const SizedBox(width: 24),
+            Flexible(flex: 2, child: _summarySection(context)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _headerBanner(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.receipt_long_rounded, color: Colors.white, size: 36),
+          const SizedBox(width: 16),
+          Text(
+            'Create Bill',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _customerDetails(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.all(16),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: SizedBox(
+        height: 600, // fixed height for scrollable content
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Serial Number at top, read-only
+                TextField(
+                  controller: serialNumberController,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Serial Number',
+                    prefixIcon: Icon(Icons.confirmation_number),
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Customer Details',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: customerNameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Customer Name',
+                    prefixIcon: Icon(Icons.person_rounded),
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: customerContactController,
+                  decoration: const InputDecoration(
+                    labelText: 'Contact',
+                    prefixIcon: Icon(Icons.phone_rounded),
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.phone,
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: customerAddressController,
+                  decoration: const InputDecoration(
+                    labelText: 'Address',
+                    prefixIcon: Icon(Icons.location_on_rounded),
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 2,
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'Machine Info',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: engineTypeController,
+                  decoration: const InputDecoration(
+                    labelText: 'Engine Type',
+                    prefixIcon: Icon(Icons.settings),
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: pumpController,
+                  decoration: const InputDecoration(
+                    labelText: 'Pump',
+                    prefixIcon: Icon(Icons.water_damage),
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: governorController,
+                  decoration: const InputDecoration(
+                    labelText: 'Governor',
+                    prefixIcon: Icon(Icons.tune),
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: feedPumpController,
+                  decoration: const InputDecoration(
+                    labelText: 'Feed Pump',
+                    prefixIcon: Icon(Icons.local_gas_station),
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: noozelHolderController,
+                  decoration: const InputDecoration(
+                    labelText: 'Noozel Holder',
+                    prefixIcon: Icon(Icons.handyman),
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: vehicleNumberController,
+                  decoration: const InputDecoration(
+                    labelText: 'Vehicle Number',
+                    prefixIcon: Icon(Icons.directions_car),
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: mechanicNameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Mechanic Name',
+                    prefixIcon: Icon(Icons.engineering),
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _datePickerField(
+                        context,
+                        label: 'Arrived Date',
+                        date: arrivedDate,
+                        onTap: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: arrivedDate ?? DateTime.now(),
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2100),
+                          );
+                          if (picked != null) setState(() => arrivedDate = picked);
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _datePickerField(
+                        context,
+                        label: 'Delivered Date',
+                        date: deliveredDate,
+                        onTap: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: deliveredDate ?? DateTime.now(),
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2100),
+                          );
+                          if (picked != null) setState(() => deliveredDate = picked);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _datePickerField(
+                  context,
+                  label: 'Billing Date',
+                  date: billingDate,
+                  onTap: () async {
+                    final picked = await showDatePicker(
+                      context: context,
+                      initialDate: billingDate ?? DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2100),
+                    );
+                    if (picked != null) setState(() => billingDate = picked);
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _datePickerField(BuildContext context, {required String label, DateTime? date, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AbsorbPointer(
+        child: TextField(
+          decoration: InputDecoration(
+            labelText: label,
+            prefixIcon: const Icon(Icons.calendar_today),
+            border: const OutlineInputBorder(),
+          ),
+          controller: TextEditingController(text: date != null ? DateFormat('yyyy-MM-dd').format(date) : ''),
+        ),
+      ),
+    );
+  }
+
+  Widget _billingItemsWidget(BuildContext context, {bool isMobile = false}) {
+    return Card(
+      margin: const EdgeInsets.all(16),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: SizedBox(
+          height: isMobile ? 300 : 500,
+          child: billingItems.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.shopping_cart_outlined,
+                        size: 64,
+                        color: Colors.grey.shade400,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No products available',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  itemCount: billingItems.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: BillingItemCard(
+                        item: billingItems[index],
+                        availableProducts: availableProducts,
+                        onUpdate: (item) => _updateBillingItem(index, item),
+                        onRemove: () {},
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ),
     );
   }
 
@@ -277,10 +550,54 @@ class _BillingScreenState extends State<BillingScreen> {
     if (billingItems.isEmpty) return const SizedBox.shrink();
     return Card(
       margin: const EdgeInsets.all(16),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
+            // Labour and other charges fields
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: pumpLabourController,
+                    decoration: const InputDecoration(
+                      labelText: 'Labour Charge (Pump)',
+                      prefixIcon: Icon(Icons.build),
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                    onChanged: (_) => setState(() {}),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    controller: nozzleLabourController,
+                    decoration: const InputDecoration(
+                      labelText: 'Labour Charge (Nozzle)',
+                      prefixIcon: Icon(Icons.build_circle),
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                    onChanged: (_) => setState(() {}),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: otherChargesController,
+              decoration: const InputDecoration(
+                labelText: 'Other Charges',
+                prefixIcon: Icon(Icons.attach_money),
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+              onChanged: (_) => setState(() {}),
+            ),
+            const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
@@ -289,6 +606,7 @@ class _BillingScreenState extends State<BillingScreen> {
                     decoration: const InputDecoration(
                       labelText: 'Discount (₹)',
                       prefixIcon: Icon(Icons.discount_rounded),
+                      border: OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.number,
                     onChanged: (_) => setState(() {}),
@@ -301,6 +619,7 @@ class _BillingScreenState extends State<BillingScreen> {
                     decoration: const InputDecoration(
                       labelText: 'Tax (%)',
                       prefixIcon: Icon(Icons.percent_rounded),
+                      border: OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.number,
                     onChanged: (_) => setState(() {}),
@@ -311,6 +630,12 @@ class _BillingScreenState extends State<BillingScreen> {
             const SizedBox(height: 16),
             const Divider(),
             _buildSummaryRow('Subtotal', subtotal),
+            if (pumpLabourCharge > 0)
+              _buildSummaryRow('Labour Charge (Pump)', pumpLabourCharge),
+            if (nozzleLabourCharge > 0)
+              _buildSummaryRow('Labour Charge (Nozzle)', nozzleLabourCharge),
+            if (otherCharges > 0)
+              _buildSummaryRow('Other Charges', otherCharges),
             if (discountAmount > 0)
               _buildSummaryRow('Discount', -discountAmount),
             if (taxAmount > 0)
@@ -325,7 +650,9 @@ class _BillingScreenState extends State<BillingScreen> {
                 icon: const Icon(Icons.receipt_long_rounded),
                 label: const Text('Generate Invoice'),
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
             ),
@@ -366,6 +693,17 @@ class _BillingScreenState extends State<BillingScreen> {
     customerAddressController.dispose();
     discountController.dispose();
     taxController.dispose();
+    engineTypeController.dispose();
+    pumpController.dispose();
+    serialNumberController.dispose();
+    governorController.dispose();
+    feedPumpController.dispose();
+    noozelHolderController.dispose();
+    vehicleNumberController.dispose();
+    mechanicNameController.dispose();
+    pumpLabourController.dispose();
+    nozzleLabourController.dispose();
+    otherChargesController.dispose();
     super.dispose();
   }
 }
