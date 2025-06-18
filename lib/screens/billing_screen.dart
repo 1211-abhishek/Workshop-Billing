@@ -31,9 +31,9 @@ class _BillingScreenState extends State<BillingScreen> {
   final TextEditingController noozelHolderController = TextEditingController();
   final TextEditingController vehicleNumberController = TextEditingController();
   final TextEditingController mechanicNameController = TextEditingController();
-  final TextEditingController pumpLabourController = TextEditingController(text: '0');
-  final TextEditingController nozzleLabourController = TextEditingController(text: '0');
-  final TextEditingController otherChargesController = TextEditingController(text: '0');
+  final TextEditingController pumpLabourController = TextEditingController();
+  final TextEditingController nozzleLabourController = TextEditingController();
+  final TextEditingController otherChargesController = TextEditingController();
   DateTime? arrivedDate;
   DateTime? deliveredDate;
   DateTime? billingDate;
@@ -121,10 +121,15 @@ class _BillingScreenState extends State<BillingScreen> {
       final invoiceNumber = await DatabaseHelper.instance.generateInvoiceNumber();
       // Only include items with quantity > 0
       final filteredBillingItems = billingItems.where((item) => item.quantity > 0).toList();
+      final pumpLabour = double.tryParse(pumpLabourController.text) ?? 0.0;
+      final nozzleLabour = double.tryParse(nozzleLabourController.text) ?? 0.0;
+      final otherCharges = double.tryParse(otherChargesController.text) ?? 0.0;
+      final subtotal = filteredBillingItems.fold(0.0, (sum, item) => sum + item.totalPrice);
+      final totalAmount = subtotal - discountAmount + taxAmount + pumpLabour + nozzleLabour + otherCharges;
       final billingHistory = BillingHistory(
         invoiceNumber: invoiceNumber,
         date: DateTime.now(),
-        totalAmount: filteredBillingItems.fold(0.0, (sum, item) => sum + item.totalPrice) - discountAmount + taxAmount,
+        totalAmount: totalAmount,
         taxAmount: taxAmount,
         discountAmount: discountAmount,
         customerName: customerNameController.text.isEmpty ? null : customerNameController.text,
@@ -141,8 +146,11 @@ class _BillingScreenState extends State<BillingScreen> {
         arrivedDate: arrivedDate,
         deliveredDate: deliveredDate,
         billingDate: billingDate,
+        pumpLabourCharge: pumpLabour,
+        nozzleLabourCharge: nozzleLabour,
+        otherCharges: otherCharges,
         items: filteredBillingItems.map((item) => BillingItem(
-          billingHistoryId: 0, // Will be set by database
+          billingHistoryId: 0, 
           productName: item.product.name,
           quantity: item.quantity,
           unitPrice: item.unitPrice,
@@ -152,7 +160,7 @@ class _BillingScreenState extends State<BillingScreen> {
       );
 
       await DatabaseHelper.instance.insertBillingHistory(billingHistory);
-      await _setSerialNumber(); // increment for next bill
+      await _setSerialNumber(); 
 
       if (!mounted) return;
       Navigator.push(
@@ -298,7 +306,7 @@ class _BillingScreenState extends State<BillingScreen> {
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: SizedBox(
-        height: 600, // fixed height for scrollable content
+        height: 700, // fixed height for scrollable content
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(20),
@@ -506,7 +514,7 @@ class _BillingScreenState extends State<BillingScreen> {
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: SizedBox(
-          height: isMobile ? 300 : 500,
+          height: isMobile ? 300 : 700,
           child: billingItems.isEmpty
               ? Center(
                   child: Column(

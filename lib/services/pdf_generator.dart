@@ -126,22 +126,46 @@ class PdfGenerator {
             child: pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pw.Text(
-                  'CUSTOMER DETAILS',
-                  style: pw.TextStyle(font: boldFont, fontSize: 12),
-                ),
+                pw.Text('CUSTOMER DETAILS', style: pw.TextStyle(font: boldFont, fontSize: 12)),
                 pw.SizedBox(height: 8),
-                if (billingHistory.customerName != null) ...[
-                  pw.Text('Name: ${billingHistory.customerName}', style: pw.TextStyle(font: font, fontSize: 10)),
-                  pw.SizedBox(height: 4),
-                ],
-                if (billingHistory.customerContact != null) ...[
-                  pw.Text('Contact: ${billingHistory.customerContact}', style: pw.TextStyle(font: font, fontSize: 10)),
-                  pw.SizedBox(height: 4),
-                ],
-                if (billingHistory.customerAddress != null) ...[
-                  pw.Text('Address: ${billingHistory.customerAddress}', style: pw.TextStyle(font: font, fontSize: 10)),
-                ],
+                pw.Text('Name: ${billingHistory.customerName ?? '-'}', style: pw.TextStyle(font: font, fontSize: 10)),
+                pw.SizedBox(height: 4),
+                pw.Text('Contact: ${billingHistory.customerContact ?? '-'}', style: pw.TextStyle(font: font, fontSize: 10)),
+                pw.SizedBox(height: 4),
+                pw.Text('Address: ${billingHistory.customerAddress ?? '-'}', style: pw.TextStyle(font: font, fontSize: 10)),
+                pw.SizedBox(height: 8),
+                pw.Text('MACHINE INFO', style: pw.TextStyle(font: boldFont, fontSize: 12)),
+                pw.SizedBox(height: 4),
+                pw.Row(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Expanded(
+                      child: pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Text('Engine Type: ${billingHistory.engineType ?? '-'}', style: pw.TextStyle(font: font, fontSize: 10)),
+                          pw.Text('Pump: ${billingHistory.pump ?? '-'}', style: pw.TextStyle(font: font, fontSize: 10)),
+                          pw.Text('Governor: ${billingHistory.governor ?? '-'}', style: pw.TextStyle(font: font, fontSize: 10)),
+                          pw.Text('Feed Pump: ${billingHistory.feedPump ?? '-'}', style: pw.TextStyle(font: font, fontSize: 10)),
+                          pw.Text('Noozel Holder: ${billingHistory.noozelHolder ?? '-'}', style: pw.TextStyle(font: font, fontSize: 10)),
+                        ],
+                      ),
+                    ),
+                    pw.SizedBox(width: 8),
+                    pw.Expanded(
+                      child: pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Text('Vehicle No: ${billingHistory.vehicleNumber ?? '-'}', style: pw.TextStyle(font: font, fontSize: 10)),
+                          pw.Text('Mechanic: ${billingHistory.mechanicName ?? '-'}', style: pw.TextStyle(font: font, fontSize: 10)),
+                          pw.Text('Arrived: ${billingHistory.arrivedDate != null ? DateFormat('dd/MM/yyyy').format(billingHistory.arrivedDate!) : '-'}', style: pw.TextStyle(font: font, fontSize: 10)),
+                          pw.Text('Delivered: ${billingHistory.deliveredDate != null ? DateFormat('dd/MM/yyyy').format(billingHistory.deliveredDate!) : '-'}', style: pw.TextStyle(font: font, fontSize: 10)),
+                          pw.Text('Billing Date: ${billingHistory.billingDate != null ? DateFormat('dd/MM/yyyy').format(billingHistory.billingDate!) : '-'}', style: pw.TextStyle(font: font, fontSize: 10)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -161,7 +185,11 @@ class PdfGenerator {
                 pw.Text(
                   'INVOICE DETAILS',
                   style: pw.TextStyle(font: boldFont, fontSize: 12),
-                ),
+                ),                          
+                pw.SizedBox(height: 8),
+                
+                pw.Text('Serial No: ${billingHistory.serialNumber ?? '-'}', style: pw.TextStyle(font: font, fontSize: 10)),
+
                 pw.SizedBox(height: 8),
                 pw.Text(
                   'Invoice No: ${billingHistory.invoiceNumber}',
@@ -249,8 +277,14 @@ class PdfGenerator {
     pw.Font font,
     pw.Font boldFont,
   ) {
-    final subtotal = billingHistory.totalAmount + billingHistory.discountAmount - billingHistory.taxAmount;
-    
+    final subtotal = billingHistory.items.fold(0.0, (sum, item) => sum + item.totalPrice);
+    final pumpLabour = billingHistory.pumpLabourCharge ?? 0.0;
+    final nozzleLabour = billingHistory.nozzleLabourCharge ?? 0.0;
+    final otherCharges = billingHistory.otherCharges ?? 0.0;
+    final discount = billingHistory.discountAmount;
+    final tax = billingHistory.taxAmount;
+    final grandTotal = subtotal - discount + tax + pumpLabour + nozzleLabour + otherCharges;
+
     return pw.Row(
       children: [
         pw.Expanded(child: pw.Container()),
@@ -259,12 +293,18 @@ class PdfGenerator {
           child: pw.Column(
             children: [
               _buildSummaryRow('Subtotal:', '₹${subtotal.toStringAsFixed(2)}', font),
-              if (billingHistory.discountAmount > 0)
-                _buildSummaryRow('Discount:', '-₹${billingHistory.discountAmount.toStringAsFixed(2)}', font),
-              if (billingHistory.taxAmount > 0)
-                _buildSummaryRow('Tax:', '₹${billingHistory.taxAmount.toStringAsFixed(2)}', font),
+              if (discount > 0)
+                _buildSummaryRow('Discount:', '-₹${discount.toStringAsFixed(2)}', font),
+              if (tax > 0)
+                _buildSummaryRow('Tax:', '₹${tax.toStringAsFixed(2)}', font),
+              if (pumpLabour > 0)
+                _buildSummaryRow('Labour (Pump):', '₹${pumpLabour.toStringAsFixed(2)}', font),
+              if (nozzleLabour > 0)
+                _buildSummaryRow('Labour (Nozzle):', '₹${nozzleLabour.toStringAsFixed(2)}', font),
+              if (otherCharges > 0)
+                _buildSummaryRow('Other Charges:', '₹${otherCharges.toStringAsFixed(2)}', font),
               pw.Divider(),
-              _buildSummaryRow('GRAND TOTAL:', '₹${billingHistory.totalAmount.toStringAsFixed(2)}', boldFont, isTotal: true),
+              _buildSummaryRow('GRAND TOTAL:', '₹${grandTotal.toStringAsFixed(2)}', boldFont, isTotal: true),
             ],
           ),
         ),

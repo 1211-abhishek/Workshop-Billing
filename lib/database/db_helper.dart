@@ -85,7 +85,10 @@ class DatabaseHelper {
         mechanicName TEXT,
         arrivedDate TEXT,
         deliveredDate TEXT,
-        billingDate TEXT
+        billingDate TEXT,
+        pumpLabourCharge REAL NOT NULL DEFAULT 0.0,
+        nozzleLabourCharge REAL NOT NULL DEFAULT 0.0,
+        otherCharges REAL NOT NULL DEFAULT 0.0
       )
     ''');
 

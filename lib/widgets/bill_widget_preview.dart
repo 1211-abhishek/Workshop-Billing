@@ -38,9 +38,39 @@ class BillWidgetPreview extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('CUSTOMER DETAILS', style: Theme.of(context).textTheme.labelLarge?.copyWith(fontSize: bodyFont, fontWeight: FontWeight.bold)),
-                    if (billingHistory.customerName != null) Text('Name: ${billingHistory.customerName}', style: TextStyle(fontSize: bodyFont)),
-                    if (billingHistory.customerContact != null) Text('Contact: ${billingHistory.customerContact}', style: TextStyle(fontSize: bodyFont)),
-                    if (billingHistory.customerAddress != null) Text('Address: ${billingHistory.customerAddress}', style: TextStyle(fontSize: bodyFont)),
+                    Text('Name:${billingHistory.customerName ?? '-'}', style: TextStyle(fontSize: bodyFont)),
+                    Text('Contact: ${billingHistory.customerContact ?? '-'}', style: TextStyle(fontSize: bodyFont)),
+                    Text('Address: ${billingHistory.customerAddress ?? '-'}', style: TextStyle(fontSize: bodyFont)),
+                    const SizedBox(height: 8),
+                    Text('MACHINE INFO', style: Theme.of(context).textTheme.labelLarge?.copyWith(fontSize: bodyFont, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 4),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Serial No: ${billingHistory.serialNumber ?? '-'}', style: TextStyle(fontSize: bodyFont)),
+                            Text('Engine Type: ${billingHistory.engineType ?? '-'}', style: TextStyle(fontSize: bodyFont)),
+                            Text('Pump: ${billingHistory.pump ?? '-'}', style: TextStyle(fontSize: bodyFont)),
+                            Text('Governor: ${billingHistory.governor ?? '-'}', style: TextStyle(fontSize: bodyFont)),
+                            Text('Feed Pump: ${billingHistory.feedPump ?? '-'}', style: TextStyle(fontSize: bodyFont)),
+                            Text('Noozel Holder: ${billingHistory.noozelHolder ?? '-'}', style: TextStyle(fontSize: bodyFont)),
+                          ],
+                        ),
+                        const SizedBox(width: 16),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Vehicle No: ${billingHistory.vehicleNumber ?? '-'}', style: TextStyle(fontSize: bodyFont)),
+                            Text('Mechanic: ${billingHistory.mechanicName ?? '-'}', style: TextStyle(fontSize: bodyFont)),
+                            Text('Arrived: ${billingHistory.arrivedDate != null ? '${billingHistory.arrivedDate!.day}/${billingHistory.arrivedDate!.month}/${billingHistory.arrivedDate!.year}' : '-'}', style: TextStyle(fontSize: bodyFont)),
+                            Text('Delivered: ${billingHistory.deliveredDate != null ? '${billingHistory.deliveredDate!.day}/${billingHistory.deliveredDate!.month}/${billingHistory.deliveredDate!.year}' : '-'}', style: TextStyle(fontSize: bodyFont)),
+                            Text('Billing Date: ${billingHistory.billingDate != null ? '${billingHistory.billingDate!.day}/${billingHistory.billingDate!.month}/${billingHistory.billingDate!.year}' : '-'}', style: TextStyle(fontSize: bodyFont)),
+                          ],
+                        ),
+                      ],
+                    ),
                   ],
                 ),
                 Column(
@@ -88,6 +118,12 @@ class BillWidgetPreview extends StatelessWidget {
                     Text('Discount: -₹${billingHistory.discountAmount.toStringAsFixed(2)}', style: TextStyle(fontSize: bodyFont)),
                   if (billingHistory.taxAmount > 0)
                     Text('Tax: ₹${billingHistory.taxAmount.toStringAsFixed(2)}', style: TextStyle(fontSize: bodyFont)),
+                  if (billingHistory.pumpLabourCharge != null && billingHistory.pumpLabourCharge! > 0)
+                    Text('Labour (Pump): ₹${billingHistory.pumpLabourCharge!.toStringAsFixed(2)}', style: TextStyle(fontSize: bodyFont)),
+                  if (billingHistory.nozzleLabourCharge != null && billingHistory.nozzleLabourCharge! > 0)
+                    Text('Labour (Nozzle): ₹${billingHistory.nozzleLabourCharge!.toStringAsFixed(2)}', style: TextStyle(fontSize: bodyFont)),
+                  if (billingHistory.otherCharges != null && billingHistory.otherCharges! > 0)
+                    Text('Other Charges: ₹${billingHistory.otherCharges!.toStringAsFixed(2)}', style: TextStyle(fontSize: bodyFont)),
                   Text('GRAND TOTAL: ₹${billingHistory.totalAmount.toStringAsFixed(2)}', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontSize: totalFont, fontWeight: FontWeight.bold)),
                 ],
               ),

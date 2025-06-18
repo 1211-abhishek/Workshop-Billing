@@ -24,6 +24,9 @@ class BillingHistory {
   final DateTime? arrivedDate;
   final DateTime? deliveredDate;
   final DateTime? billingDate;
+  final double? pumpLabourCharge;
+  final double? nozzleLabourCharge;
+  final double? otherCharges;
 
   BillingHistory({
     this.id,
@@ -49,6 +52,9 @@ class BillingHistory {
     this.arrivedDate,
     this.deliveredDate,
     this.billingDate,
+    this.pumpLabourCharge,
+    this.nozzleLabourCharge,
+    this.otherCharges,
   });
 
   Map<String, dynamic> toMap() {
@@ -75,6 +81,9 @@ class BillingHistory {
       'arrivedDate': arrivedDate?.toIso8601String(),
       'deliveredDate': deliveredDate?.toIso8601String(),
       'billingDate': billingDate?.toIso8601String(),
+      'pumpLabourCharge': pumpLabourCharge,
+      'nozzleLabourCharge': nozzleLabourCharge,
+      'otherCharges': otherCharges,
     };
   }
 
@@ -102,6 +111,9 @@ class BillingHistory {
       arrivedDate: map['arrivedDate'] != null ? DateTime.tryParse(map['arrivedDate']) : null,
       deliveredDate: map['deliveredDate'] != null ? DateTime.tryParse(map['deliveredDate']) : null,
       billingDate: map['billingDate'] != null ? DateTime.tryParse(map['billingDate']) : null,
+      pumpLabourCharge: (map['pumpLabourCharge'] ?? 0.0).toDouble(),
+      nozzleLabourCharge: (map['nozzleLabourCharge'] ?? 0.0).toDouble(),
+      otherCharges: (map['otherCharges'] ?? 0.0).toDouble(),
     );
   }
 }
