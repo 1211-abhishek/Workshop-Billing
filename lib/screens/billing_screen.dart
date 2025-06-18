@@ -7,6 +7,7 @@ import '../models/billing_history.dart';
 import '../widgets/billing_item_card.dart';
 import 'pdf_invoice_screen.dart';
 import '../responsive_layout.dart';
+import '../widgets/custom_text_field.dart';
 
 class BillingScreen extends StatefulWidget {
   const BillingScreen({super.key});
@@ -19,9 +20,13 @@ class _BillingScreenState extends State<BillingScreen> {
   List<Product> availableProducts = [];
   List<BillingItemData> billingItems = [];
   final TextEditingController customerNameController = TextEditingController();
-  final TextEditingController customerContactController = TextEditingController();
-  final TextEditingController customerAddressController = TextEditingController();
-  final TextEditingController discountController = TextEditingController(text: '0');
+  final TextEditingController customerContactController =
+      TextEditingController();
+  final TextEditingController customerAddressController =
+      TextEditingController();
+  final TextEditingController discountController = TextEditingController(
+    text: '0',
+  );
   final TextEditingController taxController = TextEditingController(text: '0');
   final TextEditingController engineTypeController = TextEditingController();
   final TextEditingController pumpController = TextEditingController();
@@ -54,11 +59,16 @@ class _BillingScreenState extends State<BillingScreen> {
       setState(() {
         availableProducts = products;
         // Initialize billingItems with all products, quantity 0
-        billingItems = products.map((product) => BillingItemData(
-          product: product,
-          quantity: 0,
-          unitPrice: product.sellingPrice,
-        )).toList();
+        billingItems =
+            products
+                .map(
+                  (product) => BillingItemData(
+                    product: product,
+                    quantity: 0,
+                    unitPrice: product.sellingPrice,
+                  ),
+                )
+                .toList();
         isLoading = false;
       });
     } catch (e) {
@@ -67,9 +77,9 @@ class _BillingScreenState extends State<BillingScreen> {
         isLoading = false;
       });
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading products: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error loading products: $e')));
       }
     }
   }
@@ -100,12 +110,20 @@ class _BillingScreenState extends State<BillingScreen> {
     return (subtotal - discountAmount) * taxPercent / 100;
   }
 
-  double get pumpLabourCharge => double.tryParse(pumpLabourController.text) ?? 0.0;
-  double get nozzleLabourCharge => double.tryParse(nozzleLabourController.text) ?? 0.0;
-  double get otherCharges => double.tryParse(otherChargesController.text) ?? 0.0;
+  double get pumpLabourCharge =>
+      double.tryParse(pumpLabourController.text) ?? 0.0;
+  double get nozzleLabourCharge =>
+      double.tryParse(nozzleLabourController.text) ?? 0.0;
+  double get otherCharges =>
+      double.tryParse(otherChargesController.text) ?? 0.0;
 
   double get grandTotal {
-    return subtotal - discountAmount + taxAmount + pumpLabourCharge + nozzleLabourCharge + otherCharges;
+    return subtotal -
+        discountAmount +
+        taxAmount +
+        pumpLabourCharge +
+        nozzleLabourCharge +
+        otherCharges;
   }
 
   Future<void> _generateInvoice() async {
@@ -118,64 +136,102 @@ class _BillingScreenState extends State<BillingScreen> {
     }
 
     try {
-      final invoiceNumber = await DatabaseHelper.instance.generateInvoiceNumber();
+      final invoiceNumber =
+          await DatabaseHelper.instance.generateInvoiceNumber();
       // Only include items with quantity > 0
-      final filteredBillingItems = billingItems.where((item) => item.quantity > 0).toList();
+      final filteredBillingItems =
+          billingItems.where((item) => item.quantity > 0).toList();
       final pumpLabour = double.tryParse(pumpLabourController.text) ?? 0.0;
       final nozzleLabour = double.tryParse(nozzleLabourController.text) ?? 0.0;
       final otherCharges = double.tryParse(otherChargesController.text) ?? 0.0;
-      final subtotal = filteredBillingItems.fold(0.0, (sum, item) => sum + item.totalPrice);
-      final totalAmount = subtotal - discountAmount + taxAmount + pumpLabour + nozzleLabour + otherCharges;
+      final subtotal = filteredBillingItems.fold(
+        0.0,
+        (sum, item) => sum + item.totalPrice,
+      );
+      final totalAmount =
+          subtotal -
+          discountAmount +
+          taxAmount +
+          pumpLabour +
+          nozzleLabour +
+          otherCharges;
       final billingHistory = BillingHistory(
         invoiceNumber: invoiceNumber,
         date: DateTime.now(),
         totalAmount: totalAmount,
         taxAmount: taxAmount,
         discountAmount: discountAmount,
-        customerName: customerNameController.text.isEmpty ? null : customerNameController.text,
-        customerContact: customerContactController.text.isEmpty ? null : customerContactController.text,
-        customerAddress: customerAddressController.text.isEmpty ? null : customerAddressController.text,
-        engineType: engineTypeController.text.isEmpty ? null : engineTypeController.text,
+        customerName:
+            customerNameController.text.isEmpty
+                ? null
+                : customerNameController.text,
+        customerContact:
+            customerContactController.text.isEmpty
+                ? null
+                : customerContactController.text,
+        customerAddress:
+            customerAddressController.text.isEmpty
+                ? null
+                : customerAddressController.text,
+        engineType:
+            engineTypeController.text.isEmpty
+                ? null
+                : engineTypeController.text,
         pump: pumpController.text.isEmpty ? null : pumpController.text,
         serialNumber: serialNumberController.text,
-        governor: governorController.text.isEmpty ? null : governorController.text,
-        feedPump: feedPumpController.text.isEmpty ? null : feedPumpController.text,
-        noozelHolder: noozelHolderController.text.isEmpty ? null : noozelHolderController.text,
-        vehicleNumber: vehicleNumberController.text.isEmpty ? null : vehicleNumberController.text,
-        mechanicName: mechanicNameController.text.isEmpty ? null : mechanicNameController.text,
+        governor:
+            governorController.text.isEmpty ? null : governorController.text,
+        feedPump:
+            feedPumpController.text.isEmpty ? null : feedPumpController.text,
+        noozelHolder:
+            noozelHolderController.text.isEmpty
+                ? null
+                : noozelHolderController.text,
+        vehicleNumber:
+            vehicleNumberController.text.isEmpty
+                ? null
+                : vehicleNumberController.text,
+        mechanicName:
+            mechanicNameController.text.isEmpty
+                ? null
+                : mechanicNameController.text,
         arrivedDate: arrivedDate,
         deliveredDate: deliveredDate,
         billingDate: billingDate,
         pumpLabourCharge: pumpLabour,
         nozzleLabourCharge: nozzleLabour,
         otherCharges: otherCharges,
-        items: filteredBillingItems.map((item) => BillingItem(
-          billingHistoryId: 0, 
-          productName: item.product.name,
-          quantity: item.quantity,
-          unitPrice: item.unitPrice,
-          totalPrice: item.totalPrice,
-          unit: item.product.unit,
-        )).toList(),
+        items:
+            filteredBillingItems
+                .map(
+                  (item) => BillingItem(
+                    billingHistoryId: 0,
+                    productName: item.product.name,
+                    quantity: item.quantity,
+                    unitPrice: item.unitPrice,
+                    totalPrice: item.totalPrice,
+                    unit: item.product.unit,
+                  ),
+                )
+                .toList(),
       );
 
       await DatabaseHelper.instance.insertBillingHistory(billingHistory);
-      await _setSerialNumber(); 
+      await _setSerialNumber();
 
       if (!mounted) return;
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => BillPreviewScreen(
-            billingHistory: billingHistory,
-          ),
+          builder:
+              (context) => BillPreviewScreen(billingHistory: billingHistory),
         ),
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error generating invoice: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error generating invoice: $e')));
     }
   }
 
@@ -190,15 +246,11 @@ class _BillingScreenState extends State<BillingScreen> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Create Bill'),
-      ),
+      appBar: AppBar(title: const Text('Create Bill')),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -271,7 +323,10 @@ class _BillingScreenState extends State<BillingScreen> {
       padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary],
+          colors: [
+            Theme.of(context).colorScheme.primary,
+            Theme.of(context).colorScheme.secondary,
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -314,14 +369,9 @@ class _BillingScreenState extends State<BillingScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Serial Number at top, read-only
-                TextField(
+                CustomTextField(
                   controller: serialNumberController,
-                  readOnly: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Serial Number',
-                    prefixIcon: Icon(Icons.confirmation_number),
-                    border: OutlineInputBorder(),
-                  ),
+                  labelText: 'Serial Number',
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -331,32 +381,20 @@ class _BillingScreenState extends State<BillingScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                TextField(
+                CustomTextField(
                   controller: customerNameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Customer Name',
-                    prefixIcon: Icon(Icons.person_rounded),
-                    border: OutlineInputBorder(),
-                  ),
+                  labelText: 'Customer Name',
                 ),
                 const SizedBox(height: 12),
-                TextField(
+                CustomTextField(
                   controller: customerContactController,
-                  decoration: const InputDecoration(
-                    labelText: 'Contact',
-                    prefixIcon: Icon(Icons.phone_rounded),
-                    border: OutlineInputBorder(),
-                  ),
+                  labelText: 'Contact',
                   keyboardType: TextInputType.phone,
                 ),
                 const SizedBox(height: 12),
-                TextField(
+                CustomTextField(
                   controller: customerAddressController,
-                  decoration: const InputDecoration(
-                    labelText: 'Address',
-                    prefixIcon: Icon(Icons.location_on_rounded),
-                    border: OutlineInputBorder(),
-                  ),
+                  labelText: 'Address',
                   maxLines: 2,
                 ),
                 const SizedBox(height: 24),
@@ -367,67 +405,36 @@ class _BillingScreenState extends State<BillingScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                TextField(
+                CustomTextField(
                   controller: engineTypeController,
-                  decoration: const InputDecoration(
-                    labelText: 'Engine Type',
-                    prefixIcon: Icon(Icons.settings),
-                    border: OutlineInputBorder(),
-                  ),
+                  labelText: 'Engine Type',
                 ),
                 const SizedBox(height: 12),
-                TextField(
-                  controller: pumpController,
-                  decoration: const InputDecoration(
-                    labelText: 'Pump',
-                    prefixIcon: Icon(Icons.water_damage),
-                    border: OutlineInputBorder(),
-                  ),
-                ),
+                CustomTextField(controller: pumpController, labelText: 'Pump'),
                 const SizedBox(height: 12),
-                TextField(
+                CustomTextField(
                   controller: governorController,
-                  decoration: const InputDecoration(
-                    labelText: 'Governor',
-                    prefixIcon: Icon(Icons.tune),
-                    border: OutlineInputBorder(),
-                  ),
+                  labelText: 'Governor',
                 ),
                 const SizedBox(height: 12),
-                TextField(
+                CustomTextField(
                   controller: feedPumpController,
-                  decoration: const InputDecoration(
-                    labelText: 'Feed Pump',
-                    prefixIcon: Icon(Icons.local_gas_station),
-                    border: OutlineInputBorder(),
-                  ),
+                  labelText: 'Feed Pump',
                 ),
                 const SizedBox(height: 12),
-                TextField(
+                CustomTextField(
                   controller: noozelHolderController,
-                  decoration: const InputDecoration(
-                    labelText: 'Noozel Holder',
-                    prefixIcon: Icon(Icons.handyman),
-                    border: OutlineInputBorder(),
-                  ),
+                  labelText: 'Noozel Holder',
                 ),
                 const SizedBox(height: 12),
-                TextField(
+                CustomTextField(
                   controller: vehicleNumberController,
-                  decoration: const InputDecoration(
-                    labelText: 'Vehicle Number',
-                    prefixIcon: Icon(Icons.directions_car),
-                    border: OutlineInputBorder(),
-                  ),
+                  labelText: 'Vehicle Number',
                 ),
                 const SizedBox(height: 12),
-                TextField(
+                CustomTextField(
                   controller: mechanicNameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Mechanic Name',
-                    prefixIcon: Icon(Icons.engineering),
-                    border: OutlineInputBorder(),
-                  ),
+                  labelText: 'Mechanic Name',
                 ),
                 const SizedBox(height: 12),
                 Row(
@@ -444,7 +451,8 @@ class _BillingScreenState extends State<BillingScreen> {
                             firstDate: DateTime(2000),
                             lastDate: DateTime(2100),
                           );
-                          if (picked != null) setState(() => arrivedDate = picked);
+                          if (picked != null)
+                            setState(() => arrivedDate = picked);
                         },
                       ),
                     ),
@@ -461,7 +469,8 @@ class _BillingScreenState extends State<BillingScreen> {
                             firstDate: DateTime(2000),
                             lastDate: DateTime(2100),
                           );
-                          if (picked != null) setState(() => deliveredDate = picked);
+                          if (picked != null)
+                            setState(() => deliveredDate = picked);
                         },
                       ),
                     ),
@@ -490,7 +499,12 @@ class _BillingScreenState extends State<BillingScreen> {
     );
   }
 
-  Widget _datePickerField(BuildContext context, {required String label, DateTime? date, required VoidCallback onTap}) {
+  Widget _datePickerField(
+    BuildContext context, {
+    required String label,
+    DateTime? date,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: AbsorbPointer(
@@ -500,7 +514,9 @@ class _BillingScreenState extends State<BillingScreen> {
             prefixIcon: const Icon(Icons.calendar_today),
             border: const OutlineInputBorder(),
           ),
-          controller: TextEditingController(text: date != null ? DateFormat('yyyy-MM-dd').format(date) : ''),
+          controller: TextEditingController(
+            text: date != null ? DateFormat('yyyy-MM-dd').format(date) : '',
+          ),
         ),
       ),
     );
@@ -515,40 +531,40 @@ class _BillingScreenState extends State<BillingScreen> {
         padding: const EdgeInsets.all(16),
         child: SizedBox(
           height: isMobile ? 300 : 700,
-          child: billingItems.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.shopping_cart_outlined,
-                        size: 64,
-                        color: Colors.grey.shade400,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No products available',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.grey.shade600,
+          child:
+              billingItems.isEmpty
+                  ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.shopping_cart_outlined,
+                          size: 64,
+                          color: Colors.grey.shade400,
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 16),
+                        Text(
+                          'No products available',
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(color: Colors.grey.shade600),
+                        ),
+                      ],
+                    ),
+                  )
+                  : ListView.builder(
+                    itemCount: billingItems.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: BillingItemCard(
+                          item: billingItems[index],
+                          availableProducts: availableProducts,
+                          onUpdate: (item) => _updateBillingItem(index, item),
+                          onRemove: () {},
+                        ),
+                      );
+                    },
                   ),
-                )
-              : ListView.builder(
-                  itemCount: billingItems.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: BillingItemCard(
-                        item: billingItems[index],
-                        availableProducts: availableProducts,
-                        onUpdate: (item) => _updateBillingItem(index, item),
-                        onRemove: () {},
-                      ),
-                    );
-                  },
-                ),
         ),
       ),
     );
@@ -568,42 +584,27 @@ class _BillingScreenState extends State<BillingScreen> {
             Row(
               children: [
                 Expanded(
-                  child: TextField(
+                  child: CustomTextField(
                     controller: pumpLabourController,
-                    decoration: const InputDecoration(
-                      labelText: 'Labour Charge (Pump)',
-                      prefixIcon: Icon(Icons.build),
-                      border: OutlineInputBorder(),
-                    ),
+                    labelText: 'Labour Charge (Pump)',
                     keyboardType: TextInputType.number,
-                    onChanged: (_) => setState(() {}),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: TextField(
+                  child: CustomTextField(
                     controller: nozzleLabourController,
-                    decoration: const InputDecoration(
-                      labelText: 'Labour Charge (Nozzle)',
-                      prefixIcon: Icon(Icons.build_circle),
-                      border: OutlineInputBorder(),
-                    ),
+                    labelText: 'Labour Charge (Nozzle)',
                     keyboardType: TextInputType.number,
-                    onChanged: (_) => setState(() {}),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 12),
-            TextField(
+            CustomTextField(
               controller: otherChargesController,
-              decoration: const InputDecoration(
-                labelText: 'Other Charges',
-                prefixIcon: Icon(Icons.attach_money),
-                border: OutlineInputBorder(),
-              ),
+              labelText: 'Other Charges',
               keyboardType: TextInputType.number,
-              onChanged: (_) => setState(() {}),
             ),
             const SizedBox(height: 16),
             Row(
@@ -646,8 +647,7 @@ class _BillingScreenState extends State<BillingScreen> {
               _buildSummaryRow('Other Charges', otherCharges),
             if (discountAmount > 0)
               _buildSummaryRow('Discount', -discountAmount),
-            if (taxAmount > 0)
-              _buildSummaryRow('Tax', taxAmount),
+            if (taxAmount > 0) _buildSummaryRow('Tax', taxAmount),
             const Divider(),
             _buildSummaryRow('Grand Total', grandTotal, isTotal: true),
             const SizedBox(height: 16),
@@ -659,8 +659,13 @@ class _BillingScreenState extends State<BillingScreen> {
                 label: const Text('Generate Invoice'),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 18),
-                  textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  textStyle: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
             ),
