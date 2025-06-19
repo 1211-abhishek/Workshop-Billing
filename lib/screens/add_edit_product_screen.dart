@@ -323,6 +323,20 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
                 ),
               ),
             ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: isLoading ? null : _saveProduct,
+                child: isLoading
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      )
+                    : Text(widget.product == null ? 'Save' : 'Update'),
+              ),
+            ),
           ],
         ),
       ),

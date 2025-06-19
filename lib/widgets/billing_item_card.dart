@@ -7,6 +7,7 @@ class BillingItemCard extends StatelessWidget {
   final List<Product> availableProducts;
   final Function(BillingItemData) onUpdate;
   final VoidCallback onRemove;
+  final int index;
 
   const BillingItemCard({
     super.key,
@@ -14,12 +15,14 @@ class BillingItemCard extends StatelessWidget {
     required this.availableProducts,
     required this.onUpdate,
     required this.onRemove,
+    required this.index,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
+      color: index % 2 == 0 ? Colors.white : Colors.grey.shade200,
+      //margin: const EdgeInsets.only(bottom: 0),
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Padding(
@@ -40,6 +43,7 @@ class BillingItemCard extends StatelessWidget {
             SizedBox(
               width: 90,
               child: Row(
+                spacing: 10,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
@@ -50,6 +54,7 @@ class BillingItemCard extends StatelessWidget {
                         ? () => onUpdate(item.copyWith(quantity: item.quantity - 1))
                         : null,
                   ),
+                  
                   Text(
                     '${item.quantity}',
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),

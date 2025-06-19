@@ -120,6 +120,21 @@ class _ManageInventoryScreenState extends State<ManageInventoryScreen> {
         tablet: _buildTablet(context),
         desktop: _buildDesktop(context),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AddEditProductScreen(),
+            ),
+          );
+          if (result == true) {
+            _loadProducts();
+          }
+        },
+        child: const Icon(Icons.add),
+        tooltip: 'Add Product',
+      ),
     );
   }
 

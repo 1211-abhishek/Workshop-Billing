@@ -366,6 +366,7 @@ class _BillingScreenState extends State<BillingScreen> {
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
+              spacing: 15,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Serial Number at top, read-only
@@ -373,70 +374,68 @@ class _BillingScreenState extends State<BillingScreen> {
                   controller: serialNumberController,
                   labelText: 'Serial Number',
                 ),
-                const SizedBox(height: 16),
                 Text(
                   'Customer Details',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 16),
                 CustomTextField(
                   controller: customerNameController,
                   labelText: 'Customer Name',
                 ),
-                const SizedBox(height: 12),
+                
                 CustomTextField(
                   controller: customerContactController,
                   labelText: 'Contact',
                   keyboardType: TextInputType.phone,
                 ),
-                const SizedBox(height: 12),
+                
                 CustomTextField(
                   controller: customerAddressController,
                   labelText: 'Address',
                   maxLines: 2,
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 15),
                 Text(
                   'Machine Info',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 16),
+                
                 CustomTextField(
                   controller: engineTypeController,
                   labelText: 'Engine Type',
                 ),
-                const SizedBox(height: 12),
+                
                 CustomTextField(controller: pumpController, labelText: 'Pump'),
-                const SizedBox(height: 12),
+                
                 CustomTextField(
                   controller: governorController,
                   labelText: 'Governor',
                 ),
-                const SizedBox(height: 12),
+                
                 CustomTextField(
                   controller: feedPumpController,
                   labelText: 'Feed Pump',
                 ),
-                const SizedBox(height: 12),
+                
                 CustomTextField(
                   controller: noozelHolderController,
                   labelText: 'Noozel Holder',
                 ),
-                const SizedBox(height: 12),
+                
                 CustomTextField(
                   controller: vehicleNumberController,
                   labelText: 'Vehicle Number',
                 ),
-                const SizedBox(height: 12),
+                
                 CustomTextField(
                   controller: mechanicNameController,
                   labelText: 'Mechanic Name',
                 ),
-                const SizedBox(height: 12),
+                
                 Row(
                   children: [
                     Expanded(
@@ -476,7 +475,7 @@ class _BillingScreenState extends State<BillingScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                
                 _datePickerField(
                   context,
                   label: 'Billing Date',
@@ -508,12 +507,10 @@ class _BillingScreenState extends State<BillingScreen> {
     return GestureDetector(
       onTap: onTap,
       child: AbsorbPointer(
-        child: TextField(
-          decoration: InputDecoration(
+        child: CustomTextField(
             labelText: label,
-            prefixIcon: const Icon(Icons.calendar_today),
-            border: const OutlineInputBorder(),
-          ),
+            
+        
           controller: TextEditingController(
             text: date != null ? DateFormat('yyyy-MM-dd').format(date) : '',
           ),
@@ -528,7 +525,7 @@ class _BillingScreenState extends State<BillingScreen> {
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(10),
         child: SizedBox(
           height: isMobile ? 300 : 700,
           child:
@@ -542,7 +539,7 @@ class _BillingScreenState extends State<BillingScreen> {
                           size: 64,
                           color: Colors.grey.shade400,
                         ),
-                        const SizedBox(height: 16),
+                        
                         Text(
                           'No products available',
                           style: Theme.of(context).textTheme.titleMedium
@@ -555,8 +552,9 @@ class _BillingScreenState extends State<BillingScreen> {
                     itemCount: billingItems.length,
                     itemBuilder: (context, index) {
                       return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        padding: const EdgeInsets.symmetric(vertical: 2),
                         child: BillingItemCard(
+                          index: index,
                           item: billingItems[index],
                           availableProducts: availableProducts,
                           onUpdate: (item) => _updateBillingItem(index, item),
@@ -579,7 +577,9 @@ class _BillingScreenState extends State<BillingScreen> {
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
+          //spacing: 15,
           children: [
+            
             // Labour and other charges fields
             Row(
               children: [
@@ -600,38 +600,32 @@ class _BillingScreenState extends State<BillingScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+                const SizedBox(height: 15),
+
             CustomTextField(
               controller: otherChargesController,
               labelText: 'Other Charges',
               keyboardType: TextInputType.number,
             ),
-            const SizedBox(height: 16),
+                const SizedBox(height: 15),
             Row(
               children: [
                 Expanded(
-                  child: TextField(
+                  child: CustomTextField(
                     controller: discountController,
-                    decoration: const InputDecoration(
                       labelText: 'Discount (₹)',
-                      prefixIcon: Icon(Icons.discount_rounded),
-                      border: OutlineInputBorder(),
-                    ),
+                      
                     keyboardType: TextInputType.number,
-                    onChanged: (_) => setState(() {}),
+                    
                   ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: TextField(
+                  child: CustomTextField(
                     controller: taxController,
-                    decoration: const InputDecoration(
                       labelText: 'Tax (%)',
-                      prefixIcon: Icon(Icons.percent_rounded),
-                      border: OutlineInputBorder(),
-                    ),
+                      
                     keyboardType: TextInputType.number,
-                    onChanged: (_) => setState(() {}),
                   ),
                 ),
               ],
@@ -677,7 +671,7 @@ class _BillingScreenState extends State<BillingScreen> {
 
   Widget _buildSummaryRow(String label, double amount, {bool isTotal = false}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

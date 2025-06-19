@@ -9,20 +9,23 @@ class CustomTextField extends StatelessWidget {
   final int? maxLines;
 
   const CustomTextField({
-    Key? key,
+    super.key,
     required this.controller,
     required this.labelText,
     this.keyboardType,
     this.obscureText = false,
     this.hintText,
     this.maxLines = 1,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+    return Container(
+      //margin: const EdgeInsets.symmetric(vertical: 8.0),
+      height: 45,
+      //alignment: Alignment(1, 1),
       child: TextField(
+        textAlign: TextAlign.start,
         controller: controller,
         keyboardType: keyboardType,
         obscureText: obscureText,
