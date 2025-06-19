@@ -93,28 +93,25 @@ class AdminScreen extends StatelessWidget {
 
   Widget _buildDesktop(BuildContext context) {
     return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1100),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Theme.of(context).colorScheme.primary.withOpacity(0.05),
-                Colors.white,
-              ],
-            ),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Theme.of(context).colorScheme.primary.withOpacity(0.05),
+              Colors.white,
+            ],
           ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 120.0, vertical: 48.0),
-            child: GridView.count(
-              crossAxisCount: 3,
-              crossAxisSpacing: 32,
-              mainAxisSpacing: 32,
-              childAspectRatio: 1,
-              children: _adminCards(context),
-            ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 50.0, vertical: 48.0),
+          child: GridView.count(
+            crossAxisCount: 4,
+            crossAxisSpacing: 32,
+            mainAxisSpacing: 32,
+            childAspectRatio: 1,
+            children: _adminCards(context),
           ),
         ),
       ),

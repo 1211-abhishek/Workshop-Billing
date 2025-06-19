@@ -273,11 +273,13 @@ class _BillingHistoryScreenState extends State<BillingHistoryScreen> {
                       ),
                     )
                   : GridView.count(
+                    childAspectRatio: 3,
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       crossAxisCount: crossAxisCount,
                       children: filteredHistory.map((billing) {
                         return Card(
-                          margin: const EdgeInsets.only(bottom: 12),
+                          margin: const EdgeInsets.only(bottom: 12, right: 8, left: 8),
+                          
                           child: ListTile(
                             contentPadding: const EdgeInsets.all(16),
                             leading: Container(

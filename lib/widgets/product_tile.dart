@@ -7,6 +7,7 @@ class ProductTile extends StatelessWidget {
   final VoidCallback? onDelete;
   final VoidCallback? onToggleSelection;
   final bool showSelectionToggle;
+  
 
   const ProductTile({
     super.key,
@@ -21,6 +22,7 @@ class ProductTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     double cardWidth;
+    double cardHeight;
     double iconSize;
     double padding;
     double fontSize;
@@ -35,15 +37,16 @@ class ProductTile extends StatelessWidget {
       padding = 16;
       fontSize = 16;
     } else {
-      cardWidth = 400;
+      cardWidth = 350;
+      cardHeight = 200;
       iconSize = 48;
-      padding = 20;
+      padding = 10;
       fontSize = 18;
     }
     return Center(
       child: SizedBox(
         width: cardWidth == double.infinity ? null : cardWidth,
-        height: width < 500 ? 120 : width < 800 ? 140 : 160, // Fixed height like CustomCard
+        height: width < 500 ? 100 : width < 800 ? 120 : 130, // Fixed height like CustomCard
         child: Card(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
@@ -52,7 +55,7 @@ class ProductTile extends StatelessWidget {
           elevation: 2,
           shadowColor: Colors.black.withOpacity(0.1),
           child: Padding(
-            padding: EdgeInsets.all(padding),
+            padding: EdgeInsets.all(5),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,

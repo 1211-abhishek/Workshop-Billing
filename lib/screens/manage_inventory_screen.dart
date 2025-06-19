@@ -132,8 +132,8 @@ class _ManageInventoryScreenState extends State<ManageInventoryScreen> {
             _loadProducts();
           }
         },
-        child: const Icon(Icons.add),
         tooltip: 'Add Product',
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -152,113 +152,113 @@ class _ManageInventoryScreenState extends State<ManageInventoryScreen> {
 
   Widget _mainContent(BuildContext context, {required int crossAxisCount}) {
     return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1100),
-        child: Column(
-          children: [
-            // Search and Filter Section
-            Container(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  TextField(
-                    controller: searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Search products...',
-                      prefixIcon: const Icon(Icons.search_rounded),
-                      suffixIcon: searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear_rounded),
-                              onPressed: () {
-                                searchController.clear();
-                              },
-                            )
-                          : null,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: categories.map((category) {
-                        final isSelected = selectedCategory == category;
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: FilterChip(
-                            label: Text(category),
-                            selected: isSelected,
-                            onSelected: (selected) {
-                              setState(() {
-                                selectedCategory = category;
-                              });
-                              _filterProducts();
+      child: Column(
+        children: [
+          // Search and Filter Section
+          Container(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                TextField(
+                  controller: searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search products...',
+                    prefixIcon: const Icon(Icons.search_rounded),
+                    suffixIcon: searchController.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear_rounded),
+                            onPressed: () {
+                              searchController.clear();
                             },
-                          ),
-                        );
-                      }).toList(),
-                    ),
+                          )
+                        : null,
                   ),
-                ],
-              ),
-            ),
-
-            // Products List
-            Expanded(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : filteredProducts.isEmpty
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.inventory_2_outlined,
-                                size: 64,
-                                color: Colors.grey.shade400,
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                products.isEmpty ? 'No products found' : 'No matching products',
-                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: Colors.grey.shade600,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                products.isEmpty 
-                                    ? 'Tap + to add your first product'
-                                    : 'Try adjusting your search or filters',
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Colors.grey.shade500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      : GridView.count(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          crossAxisCount: crossAxisCount,
-                          children: filteredProducts.map((product) {
-                            return ProductTile(
-                              product: product,
-                              onEdit: () async {
-                                final result = await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => AddEditProductScreen(product: product),
-                                  ),
-                                );
-                                if (result == true) {
-                                  _loadProducts();
-                                }
-                              },
-                              onDelete: () => _deleteProduct(product),
-                            );
-                          }).toList(),
+                ),
+                const SizedBox(height: 12),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: categories.map((category) {
+                      final isSelected = selectedCategory == category;
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: FilterChip(
+                          label: Text(category),
+                          selected: isSelected,
+                          onSelected: (selected) {
+                            setState(() {
+                              selectedCategory = category;
+                            });
+                            _filterProducts();
+                          },
                         ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+      
+          // Products List
+          Expanded(
+            child: isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : filteredProducts.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.inventory_2_outlined,
+                              size: 64,
+                              color: Colors.grey.shade400,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              products.isEmpty ? 'No products found' : 'No matching products',
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              products.isEmpty 
+                                  ? 'Tap + to add your first product'
+                                  : 'Try adjusting your search or filters',
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: Colors.grey.shade500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : GridView.count(
+                        //padding: const EdgeInsets.symmetric(horizontal: 6),
+                        crossAxisCount: crossAxisCount,
+                        childAspectRatio: 3, // Adjusted for ProductTile's width/height
+                        mainAxisSpacing: 16,
+                        crossAxisSpacing: 16,
+                        children: filteredProducts.map((product) {
+                          return ProductTile(
+                            product: product,
+                            onEdit: () async {
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AddEditProductScreen(product: product),
+                                ),
+                              );
+                              if (result == true) {
+                                _loadProducts();
+                              }
+                            },
+                            onDelete: () => _deleteProduct(product),
+                          );
+                        }).toList(),
+                      ),
+          ),
+        ],
       ),
     );
   }
