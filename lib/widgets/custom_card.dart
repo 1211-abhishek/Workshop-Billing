@@ -25,28 +25,24 @@ class CustomCard extends StatelessWidget {
     double padding;
     if (width < 500) {
       cardWidth = double.infinity;
-      cardHeight = double.infinity;
+      cardHeight = 160;
       iconSize = 25;
-      padding = 5;
+      padding = 12;
     } else if (width < 800) {
-      cardWidth = 350;
-      cardHeight = 450;
+      cardWidth = 320;
+      cardHeight = 210;
       iconSize = 30;
-      padding = 7;
+      padding = 16;
     } else {
-      cardWidth = 400;
-      cardHeight = 500;
+      cardWidth = 360;
+      cardHeight = 220;
       iconSize = 40;
-      padding = 7;
+      padding = 20;
     }
     return Center(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          minWidth: 140,
-          maxWidth: cardWidth,
-          minHeight: 120,
-          maxHeight: 220,
-        ),
+      child: SizedBox(
+        width: cardWidth == double.infinity ? null : cardWidth,
+        height: cardHeight,
         child: Card(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
@@ -59,53 +55,57 @@ class CustomCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             child: Padding(
               padding: EdgeInsets.all(padding),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Flexible(
-                    child: Container(
-                      padding: EdgeInsets.all(padding),
-                      decoration: BoxDecoration(
-                        color: (iconColor ?? Theme.of(context).colorScheme.primary)
-                            .withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Icon(
-                        icon,
-                        size: iconSize,
-                        color: iconColor ?? Theme.of(context).colorScheme.primary,
+              child: IntrinsicHeight(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: Container(
+                        padding: EdgeInsets.all(padding / 2),
+                        decoration: BoxDecoration(
+                          color: (iconColor ?? Theme.of(context).colorScheme.primary)
+                              .withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: Icon(
+                          icon,
+                          size: iconSize,
+                          color: iconColor ?? Theme.of(context).colorScheme.primary,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  Flexible(
-                    child: Text(
-                      title,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        fontSize: width < 500 ? 16 : width < 800 ? 18 : 20,
+                    const SizedBox(height: 12),
+                    Expanded(
+                      flex: 1,
+                      child: Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: width < 500 ? 16 : width < 800 ? 18 : 20,
+                        ),
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
                       ),
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Flexible(
-                    child: Text(
-                      subtitle,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey.shade600,
-                        fontSize: width < 500 ? 12 : 14,
+                    const SizedBox(height: 6),
+                    Expanded(
+                      flex: 1,
+                      child: Text(
+                        subtitle,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Colors.grey.shade600,
+                          fontSize: width < 500 ? 12 : 14,
+                        ),
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
                       ),
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
