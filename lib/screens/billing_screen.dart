@@ -384,13 +384,13 @@ class _BillingScreenState extends State<BillingScreen> {
                   controller: customerNameController,
                   labelText: 'Customer Name',
                 ),
-                
+
                 CustomTextField(
                   controller: customerContactController,
                   labelText: 'Contact',
                   keyboardType: TextInputType.phone,
                 ),
-                
+
                 CustomTextField(
                   controller: customerAddressController,
                   labelText: 'Address',
@@ -403,39 +403,39 @@ class _BillingScreenState extends State<BillingScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                
+
                 CustomTextField(
                   controller: engineTypeController,
                   labelText: 'Engine Type',
                 ),
-                
+
                 CustomTextField(controller: pumpController, labelText: 'Pump'),
-                
+
                 CustomTextField(
                   controller: governorController,
                   labelText: 'Governor',
                 ),
-                
+
                 CustomTextField(
                   controller: feedPumpController,
                   labelText: 'Feed Pump',
                 ),
-                
+
                 CustomTextField(
                   controller: noozelHolderController,
                   labelText: 'Noozel Holder',
                 ),
-                
+
                 CustomTextField(
                   controller: vehicleNumberController,
                   labelText: 'Vehicle Number',
                 ),
-                
+
                 CustomTextField(
                   controller: mechanicNameController,
                   labelText: 'Mechanic Name',
                 ),
-                
+
                 Row(
                   children: [
                     Expanded(
@@ -475,7 +475,7 @@ class _BillingScreenState extends State<BillingScreen> {
                     ),
                   ],
                 ),
-                
+
                 _datePickerField(
                   context,
                   label: 'Billing Date',
@@ -508,9 +508,8 @@ class _BillingScreenState extends State<BillingScreen> {
       onTap: onTap,
       child: AbsorbPointer(
         child: CustomTextField(
-            labelText: label,
-            
-        
+          labelText: label,
+
           controller: TextEditingController(
             text: date != null ? DateFormat('yyyy-MM-dd').format(date) : '',
           ),
@@ -539,7 +538,7 @@ class _BillingScreenState extends State<BillingScreen> {
                           size: 64,
                           color: Colors.grey.shade400,
                         ),
-                        
+
                         Text(
                           'No products available',
                           style: Theme.of(context).textTheme.titleMedium
@@ -579,7 +578,6 @@ class _BillingScreenState extends State<BillingScreen> {
         child: Column(
           //spacing: 15,
           children: [
-            
             // Labour and other charges fields
             Row(
               children: [
@@ -588,6 +586,7 @@ class _BillingScreenState extends State<BillingScreen> {
                     controller: pumpLabourController,
                     labelText: 'Labour Charge (Pump)',
                     keyboardType: TextInputType.number,
+                    onChanged: (_) => setState(() {}),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -596,36 +595,37 @@ class _BillingScreenState extends State<BillingScreen> {
                     controller: nozzleLabourController,
                     labelText: 'Labour Charge (Nozzle)',
                     keyboardType: TextInputType.number,
+                    onChanged: (_) => setState(() {}),
                   ),
                 ),
               ],
             ),
-                const SizedBox(height: 15),
+            const SizedBox(height: 15),
 
             CustomTextField(
               controller: otherChargesController,
               labelText: 'Other Charges',
               keyboardType: TextInputType.number,
+              onChanged: (_) => setState(() {}),
             ),
-                const SizedBox(height: 15),
+            const SizedBox(height: 15),
             Row(
               children: [
                 Expanded(
                   child: CustomTextField(
                     controller: discountController,
-                      labelText: 'Discount (₹)',
-                      
+                    labelText: 'Discount (₹)',
                     keyboardType: TextInputType.number,
-                    
+                    onChanged: (_) => setState(() {}),
                   ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: CustomTextField(
                     controller: taxController,
-                      labelText: 'Tax (%)',
-                      
+                    labelText: 'Tax (%)',
                     keyboardType: TextInputType.number,
+                    onChanged: (_) => setState(() {}),
                   ),
                 ),
               ],
