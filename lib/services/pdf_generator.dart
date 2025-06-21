@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/services.dart';
 import '../models/billing_history.dart';
 
 class PdfGenerator {
@@ -21,9 +22,14 @@ class PdfGenerator {
     try {
       print('[PDF] generateInvoice called');
       final pdf = pw.Document();
-      final font = await PdfGoogleFonts.nunitoRegular();
-      final boldFont = await PdfGoogleFonts.nunitoBold();
-
+      print('[PDF] Loading Nunito-Regular.ttf from assets...');
+      final fontData = await rootBundle.load('assets/fonts/Nunito-Regular.ttf');
+      print('[PDF] Loading Nunito-Bold.ttf from assets...');
+      final boldFontData = await rootBundle.load('assets/fonts/Nunito-Bold.ttf');
+      print('[PDF] Creating pw.Font objects...');
+      final font = pw.Font.ttf(fontData);
+      final boldFont = pw.Font.ttf(boldFontData);
+      print('[PDF] Adding page to document...');
       pdf.addPage(
         pw.Page(
           pageFormat: format,
@@ -61,7 +67,8 @@ class PdfGenerator {
       print('[PDF] PDF generated successfully in generate invoice method');
       return pdf.save();
     } catch (e, stack) {
-      print('[PDF][ERROR] Error generating PDF: $e\n$stack');
+      print('[PDF][ERROR] Error generating PDF: $e');
+      print('[PDF][ERROR] Stack trace: $stack');
       rethrow;
     }
   }
