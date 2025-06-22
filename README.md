@@ -23,7 +23,7 @@ A modern, cross-platform billing and invoice management application built with F
 ### Installation
 1. Clone the repository:
    ```sh
-   git clone <your-repo-url>
+   git clone https://github.com/flutter-AbhishekGhogare/Workshop-Billing.git
    cd flutter_billing_system
    ```
 2. Install dependencies:
