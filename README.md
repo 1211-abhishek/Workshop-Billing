@@ -57,11 +57,7 @@ A modern, cross-platform billing and invoice management application built with F
 - [sqflite_common_ffi](https://pub.dev/packages/sqflite_common_ffi) (for Windows)
 - [pdf](https://pub.dev/packages/pdf), [printing](https://pub.dev/packages/printing)
 - [share_plus](https://pub.dev/packages/share_plus)
-- [permission_handler](https://pub.dev/packages/permission_handler)
 - [intl](https://pub.dev/packages/intl)
-
-## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ---
 
