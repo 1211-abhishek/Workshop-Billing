@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:pdf/pdf.dart';
@@ -20,22 +21,22 @@ class PdfGenerator {
     PdfPageFormat format,
   ) async {
     try {
-      print('[PDF] generateInvoice called');
+      log('[PDF] generateInvoice called');
       final pdf = pw.Document();
-      print('[PDF] Loading Nunito-Regular.ttf from assets...');
+      log('[PDF] Loading Nunito-Regular.ttf from assets...');
       final fontData = await rootBundle.load('assets/fonts/Nunito-Regular.ttf');
-      print('[PDF] Loading Nunito-Bold.ttf from assets...');
+      log('[PDF] Loading Nunito-Bold.ttf from assets...');
       final boldFontData = await rootBundle.load('assets/fonts/Nunito-Bold.ttf');
-      print('[PDF] Creating pw.Font objects...');
+      log('[PDF] Creating pw.Font objects...');
       final font = pw.Font.ttf(fontData);
       final boldFont = pw.Font.ttf(boldFontData);
-      print('[PDF] Adding page to document...');
+      log('[PDF] Adding page to document...');
       pdf.addPage(
         pw.Page(
           pageFormat: format,
           margin: const pw.EdgeInsets.all(20),
           build: (pw.Context context) {
-            print('[PDF] Building PDF page');
+            log('[PDF] Building PDF page');
             return pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
@@ -64,11 +65,11 @@ class PdfGenerator {
         ),
       );
 
-      print('[PDF] PDF generated successfully in generate invoice method');
+      log('[PDF] PDF generated successfully in generate invoice method');
       return pdf.save();
     } catch (e, stack) {
-      print('[PDF][ERROR] Error generating PDF: $e');
-      print('[PDF][ERROR] Stack trace: $stack');
+      log('[PDF][ERROR] Error generating PDF: $e');
+      log('[PDF][ERROR] Stack trace: $stack');
       rethrow;
     }
   }
@@ -379,7 +380,7 @@ class PdfGenerator {
 
   static Future<void> shareInvoice(BillingHistory billingHistory) async {
     try {
-      print('[PDF] shareInvoice called');
+      log('[PDF] shareInvoice called');
       final pdfBytes = await generateInvoice(billingHistory, PdfPageFormat.a4);
       final directory = await getTemporaryDirectory();
       final file = File('${directory.path}/invoice_${billingHistory.invoiceNumber}.pdf');
@@ -389,24 +390,24 @@ class PdfGenerator {
         [XFile(file.path)],
         text: 'Invoice ${billingHistory.invoiceNumber}',
       );
-      print('[PDF] Invoice shared successfully');
+      log('[PDF] Invoice shared successfully');
     } catch (e, stack) {
-      print('[PDF][ERROR] Failed to share invoice: $e\n$stack');
+      log('[PDF][ERROR] Failed to share invoice: $e\n$stack');
       throw Exception('Failed to share invoice: $e');
     }
   }
 
   static Future<String> saveInvoice(BillingHistory billingHistory) async {
     try {
-      print('[PDF] saveInvoice called');
+      log('[PDF] saveInvoice called');
       final pdfBytes = await generateInvoice(billingHistory, PdfPageFormat.a4);
       final directory = await getApplicationDocumentsDirectory();
       final file = File('${directory.path}/invoice_${billingHistory.invoiceNumber}.pdf');
       await file.writeAsBytes(pdfBytes);
-      print('[PDF] Invoice saved at ${file.path}');
+      log('[PDF] Invoice saved at ${file.path}');
       return file.path;
     } catch (e, stack) {
-      print('[PDF][ERROR] Failed to save invoice: $e\n$stack');
+      log('[PDF][ERROR] Failed to save invoice: $e\n$stack');
       throw Exception('Failed to save invoice: $e');
     }
   }

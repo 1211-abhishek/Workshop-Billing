@@ -8,7 +8,6 @@ import 'package:file_selector/file_selector.dart';
 import '../database/db_helper.dart';
 import '../models/product.dart';
 import '../models/customer.dart';
-import '../models/billing_history.dart';
 
 class BackupService {
   static Future<void> exportProducts(BuildContext context) async {

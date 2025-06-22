@@ -1,5 +1,3 @@
-import 'product.dart';
-
 class BillingHistory {
   final int? id;
   final String invoiceNumber;

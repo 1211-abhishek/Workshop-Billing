@@ -5,7 +5,6 @@ import '../database/db_helper.dart';
 import '../models/product.dart';
 import '../models/billing_history.dart';
 import '../widgets/billing_item_card.dart';
-import 'pdf_invoice_screen.dart';
 import '../responsive_layout.dart';
 import '../widgets/custom_text_field.dart';
 
@@ -450,8 +449,9 @@ class _BillingScreenState extends State<BillingScreen> {
                             firstDate: DateTime(2000),
                             lastDate: DateTime(2100),
                           );
-                          if (picked != null)
+                          if (picked != null) {
                             setState(() => arrivedDate = picked);
+                          }
                         },
                       ),
                     ),
@@ -468,8 +468,9 @@ class _BillingScreenState extends State<BillingScreen> {
                             firstDate: DateTime(2000),
                             lastDate: DateTime(2100),
                           );
-                          if (picked != null)
+                          if (picked != null) {
                             setState(() => deliveredDate = picked);
+                          }
                         },
                       ),
                     ),
