@@ -11,6 +11,7 @@ SolidCompression=yes
 
 [Files]
 Source: "MyBillingApp\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "vc_redist.x64.exe"; DestDir: "{tmp}"; Flags: dontcopy
 
 [Icons]
 Name: "{group}\Workshop Billing System"; Filename: "{app}\flutter_billing_system.exe"
@@ -20,4 +21,12 @@ Name: "{commondesktop}\Workshop Billing System"; Filename: "{app}\flutter_billin
 Name: "desktopicon"; Description: "Create a &desktop shortcut"; GroupDescription: "Additional icons:"
 
 [Run]
+Filename: "{tmp}\vc_redist.x64.exe"; Parameters: "/install /quiet /norestart"; StatusMsg: "Installing Microsoft Visual C++ Redistributable..."; Check: NeedsVC
 Filename: "{app}\flutter_billing_system.exe"; Description: "Launch Workshop Billing System"; Flags: nowait postinstall skipifsilent
+
+[Code]
+function NeedsVC(): Boolean;
+begin
+  // Check if the VC++ 2015-2022 redistributable is installed
+  Result := not RegKeyExists(HKLM, 'SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64');
+end;
