@@ -10,7 +10,7 @@ class BillingHistory {
   final String? customerContact;
   final String? customerAddress;
   final String? remarks;
-  final List<BillingItem> items;
+  final List<BillingHistoryItem> items;
   final String? engineType;
   final String? pump;
   final String? serialNumber;
@@ -116,18 +116,18 @@ class BillingHistory {
   }
 }
 
-class BillingItem {
+class BillingHistoryItem {
   final int? id;
-  final int billingHistoryId;
+  final int? billingHistoryId;
   final String productName;
   final int quantity;
   final double unitPrice;
   final double totalPrice;
   final String? unit;
 
-  BillingItem({
+  BillingHistoryItem({
     this.id,
-    required this.billingHistoryId,
+    this.billingHistoryId,
     required this.productName,
     required this.quantity,
     required this.unitPrice,
@@ -147,10 +147,10 @@ class BillingItem {
     };
   }
 
-  factory BillingItem.fromMap(Map<String, dynamic> map) {
-    return BillingItem(
+  factory BillingHistoryItem.fromMap(Map<String, dynamic> map) {
+    return BillingHistoryItem(
       id: map['id'],
-      billingHistoryId: map['billingHistoryId'] ?? 0,
+      billingHistoryId: map['billingHistoryId'],
       productName: map['productName'] ?? '',
       quantity: map['quantity'] ?? 0,
       unitPrice: (map['unitPrice'] ?? 0.0).toDouble(),

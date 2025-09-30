@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_billing_system/ui/responsive/bill_preview_screen_desktop.dart';
+import 'package:flutter_billing_system/ui/responsive/bill_preview_screen_mobile.dart';
+import 'package:flutter_billing_system/ui/responsive/bill_preview_screen_tablet.dart';
 import '../models/billing_history.dart';
-import '../widgets/bill_widget_preview.dart';
 import 'package:pdf/pdf.dart';
 import '../services/pdf_generator.dart';
 import 'package:printing/printing.dart';
@@ -8,6 +10,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:responsive_builder/responsive_builder.dart';
 
 class BillPreviewScreen extends StatefulWidget {
   final BillingHistory billingHistory;
@@ -29,7 +32,8 @@ class _BillPreviewScreenState extends State<BillPreviewScreen> {
 
   void _generatePdfInBackground() async {
     try {
-      final pdfBytes = await PdfGenerator.generateInvoice(widget.billingHistory, PdfPageFormat.a4);
+      final pdfBytes = await PdfGenerator.generateInvoice(
+          widget.billingHistory, PdfPageFormat.a4);
       if (mounted) {
         setState(() {
           _pdfBytes = pdfBytes;
@@ -69,7 +73,8 @@ class _BillPreviewScreenState extends State<BillPreviewScreen> {
     setState(() => isGenerating = true);
     try {
       final directory = await getTemporaryDirectory();
-      final file = File('${directory.path}/invoice_${widget.billingHistory.invoiceNumber}.pdf');
+      final file = File(
+          '${directory.path}/invoice_${widget.billingHistory.invoiceNumber}.pdf');
       await file.writeAsBytes(_pdfBytes!);
       await Share.shareXFiles(
         [XFile(file.path)],
@@ -91,37 +96,28 @@ class _BillPreviewScreenState extends State<BillPreviewScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Bill Preview')),
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              Expanded(child: BillWidgetPreview(billingHistory: widget.billingHistory)),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: (!isGenerating && _pdfBytes != null) ? _printPdf : null,
-                      icon: const Icon(Icons.print),
-                      label: const Text('Print PDF'),
-                    ),
-                    ElevatedButton.icon(
-                      onPressed: (!isGenerating && _pdfBytes != null) ? _sharePdf : null,
-                      icon: const Icon(Icons.share),
-                      label: const Text('Share PDF'),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          //if (isGenerating && _pdfBytes == null)
-            // Container(
-            //   color: Colors.black.withOpacity(0.1),
-            //   child: const Center(child: CircularProgressIndicator()),
-            // ),
-        ],
+      body: ScreenTypeLayout.builder(
+        mobile: (BuildContext context) => BillPreviewScreenMobile(
+          billingHistory: widget.billingHistory,
+          isGenerating: isGenerating,
+          pdfBytes: _pdfBytes,
+          onPrint: _printPdf,
+          onShare: _sharePdf,
+        ),
+        tablet: (BuildContext context) => BillPreviewScreenTablet(
+          billingHistory: widget.billingHistory,
+          isGenerating: isGenerating,
+          pdfBytes: _pdfBytes,
+          onPrint: _printPdf,
+          onShare: _sharePdf,
+        ),
+        desktop: (BuildContext context) => BillPreviewScreenDesktop(
+          billingHistory: widget.billingHistory,
+          isGenerating: isGenerating,
+          pdfBytes: _pdfBytes,
+          onPrint: _printPdf,
+          onShare: _sharePdf,
+        ),
       ),
     );
   }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../database/db_helper.dart';
 import '../models/customer.dart';
-import '../responsive_layout.dart';
 
 class AddEditCustomerScreen extends StatefulWidget {
   final Customer? customer;
@@ -20,7 +19,7 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
   final _addressController = TextEditingController();
   final _gstController = TextEditingController();
   final _remarksController = TextEditingController();
-  
+
   bool isLoading = false;
 
   @override
@@ -52,11 +51,26 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
       final customer = Customer(
         id: widget.customer?.id,
         name: _nameController.text.trim(),
-        contactNumber: _contactController.text.trim().isEmpty ? null : _contactController.text.trim(),
-        email: _emailController.text.trim().isEmpty ? null : _emailController.text.trim(),
-        address: _addressController.text.trim().isEmpty ? null : _addressController.text.trim(),
-        gstNumber: _gstController.text.trim().isEmpty ? null : _gstController.text.trim(),
-        remarks: _remarksController.text.trim().isEmpty ? null : _remarksController.text.trim(),
+        contactNumber:
+            _contactController.text.trim().isEmpty
+                ? null
+                : _contactController.text.trim(),
+        email:
+            _emailController.text.trim().isEmpty
+                ? null
+                : _emailController.text.trim(),
+        address:
+            _addressController.text.trim().isEmpty
+                ? null
+                : _addressController.text.trim(),
+        gstNumber:
+            _gstController.text.trim().isEmpty
+                ? null
+                : _gstController.text.trim(),
+        remarks:
+            _remarksController.text.trim().isEmpty
+                ? null
+                : _remarksController.text.trim(),
         createdAt: widget.customer?.createdAt,
       );
 
@@ -71,18 +85,18 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              widget.customer == null 
-                  ? 'Customer added successfully' 
-                  : 'Customer updated successfully'
+              widget.customer == null
+                  ? 'Customer added successfully'
+                  : 'Customer updated successfully',
             ),
           ),
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving customer: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error saving customer: $e')));
       }
     } finally {
       setState(() {
@@ -97,15 +111,17 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
       appBar: AppBar(
         title: Text(widget.customer == null ? 'Add Customer' : 'Edit Customer'),
       ),
-      body: ResponsiveLayout(
-        mobile: _buildForm(context, padding: 16),
-        tablet: _buildForm(context, padding: 48),
-        desktop: _buildForm(context, padding: 120),
-      ),
+      body: LayoutBuilder(builder: (context, constraints) {
+        return _buildForm(context,
+            padding: constraints.maxWidth > 600 ? 48 : 16);
+      }),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: isLoading ? null : _saveCustomer,
         label: const Text('Save Customer'),
-        icon: isLoading ? const CircularProgressIndicator(strokeWidth: 2) : const Icon(Icons.save_rounded),
+        icon:
+            isLoading
+                ? const CircularProgressIndicator(strokeWidth: 2)
+                : const Icon(Icons.save_rounded),
       ),
     );
   }
@@ -113,10 +129,7 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
   Widget _buildForm(BuildContext context, {required double padding}) {
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          maxWidth: 500,
-          maxHeight: 700,
-        ),
+        constraints: const BoxConstraints(maxWidth: 500, maxHeight: 700),
         child: SingleChildScrollView(
           padding: EdgeInsets.all(padding),
           child: Form(
@@ -132,9 +145,8 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
                       children: [
                         Text(
                           'Basic Information',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
@@ -177,7 +189,9 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
                           keyboardType: TextInputType.emailAddress,
                           validator: (value) {
                             if (value != null && value.trim().isNotEmpty) {
-                              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                              if (!RegExp(
+                                r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                              ).hasMatch(value)) {
                                 return 'Please enter valid email address';
                               }
                             }
@@ -206,9 +220,8 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
                       children: [
                         Text(
                           'Business Information',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 16),
                         TextFormField(

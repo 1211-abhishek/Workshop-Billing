@@ -1,10 +1,10 @@
 import 'dart:async';
+import 'package:flutter_billing_system/models/billing_history.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/product.dart';
 import '../models/customer.dart';
-import '../models/billing_history.dart';
 import 'package:logging/logging.dart';
 
 final _log = Logger('DatabaseHelper');
@@ -225,9 +225,9 @@ class DatabaseHelper {
       final id = await db.insert('billing_history', billing.toMap());
       _log.info('[DB] Inserted billing_history id: $id');
       // Insert billing items
-      for (BillingItem item in billing.items) {
+      for (BillingHistoryItem item in billing.items) {
         _log.info('[DB] Inserting billing item for billingHistoryId=$id, productName=${item.productName}');
-        await db.insert('billing_items', item.copyWith(billingHistoryId: id).toMap());
+        await db.insert('billing_items', item.toMap());
       }
       return id;
     } catch (e) {
@@ -250,14 +250,14 @@ class DatabaseHelper {
     return billings;
   }
 
-  Future<List<BillingItem>> getBillingItems(int billingHistoryId) async {
+  Future<List<BillingHistoryItem>> getBillingItems(int billingHistoryId) async {
     final db = await instance.database;
     final result = await db.query(
       'billing_items',
       where: 'billingHistoryId = ?',
       whereArgs: [billingHistoryId],
     );
-    return result.map((map) => BillingItem.fromMap(map)).toList();
+    return result.map((map) => BillingHistoryItem.fromMap(map)).toList();
   }
 
   Future<String> generateInvoiceNumber() async {
@@ -308,28 +308,6 @@ class DatabaseHelper {
   }
 }
 
-extension BillingItemExtension on BillingItem {
-  BillingItem copyWith({
-    int? id,
-    int? billingHistoryId,
-    String? productName,
-    int? quantity,
-    double? unitPrice,
-    double? totalPrice,
-    String? unit,
-  }) {
-    return BillingItem(
-      id: id ?? this.id,
-      billingHistoryId: billingHistoryId ?? this.billingHistoryId,
-      productName: productName ?? this.productName,
-      quantity: quantity ?? this.quantity,
-      unitPrice: unitPrice ?? this.unitPrice,
-      totalPrice: totalPrice ?? this.totalPrice,
-      unit: unit ?? this.unit,
-    );
-  }
-}
-
 extension BillingHistoryExtension on BillingHistory {
   BillingHistory copyWith({
     int? id,
@@ -343,7 +321,7 @@ extension BillingHistoryExtension on BillingHistory {
     String? customerContact,
     String? customerAddress,
     String? remarks,
-    List<BillingItem>? items,
+    List<BillingHistoryItem>? items,
   }) {
     return BillingHistory(
       id: id ?? this.id,

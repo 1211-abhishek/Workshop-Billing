@@ -8,16 +8,12 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import '../models/billing_history.dart';
 import '../services/pdf_generator.dart';
-import '../responsive_layout.dart';
 import '../widgets/bill_widget_preview.dart';
 
 class PdfInvoiceScreen extends StatefulWidget {
   final BillingHistory billingHistory;
 
-  const PdfInvoiceScreen({
-    super.key,
-    required this.billingHistory,
-  });
+  const PdfInvoiceScreen({super.key, required this.billingHistory});
 
   @override
   State<PdfInvoiceScreen> createState() => _PdfInvoiceScreenState();
@@ -56,7 +52,9 @@ class _PdfInvoiceScreenState extends State<PdfInvoiceScreen> {
     }
   }
 
-  static Future<Uint8List> _generatePdfInIsolate(Map<String, dynamic> args) async {
+  static Future<Uint8List> _generatePdfInIsolate(
+    Map<String, dynamic> args,
+  ) async {
     final BillingHistory billingHistory = args['billingHistory'];
     final PdfPageFormat format = args['format'];
     return await PdfGenerator.generateInvoice(billingHistory, format);
@@ -68,24 +66,11 @@ class _PdfInvoiceScreenState extends State<PdfInvoiceScreen> {
       appBar: AppBar(
         title: Text('Invoice ${widget.billingHistory.invoiceNumber}'),
       ),
-      body: ResponsiveLayout(
-        mobile: _buildMobile(context),
-        tablet: _buildTablet(context),
-        desktop: _buildDesktop(context),
-      ),
+      body: LayoutBuilder(builder: (context, constraints) {
+        return _mainContent(context,
+            padding: constraints.maxWidth > 600 ? 48 : 16);
+      }),
     );
-  }
-
-  Widget _buildMobile(BuildContext context) {
-    return _mainContent(context, padding: 16);
-  }
-
-  Widget _buildTablet(BuildContext context) {
-    return _mainContent(context, padding: 48);
-  }
-
-  Widget _buildDesktop(BuildContext context) {
-    return _mainContent(context, padding: 120);
   }
 
   Widget _mainContent(BuildContext context, {required double padding}) {
@@ -99,16 +84,17 @@ class _PdfInvoiceScreenState extends State<PdfInvoiceScreen> {
             ),
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 16),
-              child: Center(
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
+              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
             ),
           ] else ...[
             Expanded(
               child: PdfPreview(
                 build: (format) async {
                   if (_cachedPdfBytes != null) return _cachedPdfBytes!;
-                  return await PdfGenerator.generateInvoice(widget.billingHistory, format);
+                  return await PdfGenerator.generateInvoice(
+                    widget.billingHistory,
+                    format,
+                  );
                 },
                 allowPrinting: true,
                 allowSharing: true,
@@ -149,10 +135,12 @@ class _PdfInvoiceScreenState extends State<PdfInvoiceScreen> {
     setState(() => isGenerating = true);
 
     try {
-      final pdfBytes = _cachedPdfBytes ?? await PdfGenerator.generateInvoice(
-        widget.billingHistory,
-        PdfPageFormat.a4,
-      );
+      final pdfBytes =
+          _cachedPdfBytes ??
+          await PdfGenerator.generateInvoice(
+            widget.billingHistory,
+            PdfPageFormat.a4,
+          );
       if (kIsWeb) {
         await Printing.sharePdf(
           bytes: pdfBytes,
@@ -160,20 +148,21 @@ class _PdfInvoiceScreenState extends State<PdfInvoiceScreen> {
         );
       } else {
         final directory = await getTemporaryDirectory();
-        final file = File('${directory.path}/invoice_${widget.billingHistory.invoiceNumber}.pdf');
-        await file.writeAsBytes(pdfBytes);
-        await Share.shareXFiles(
-          [XFile(file.path)],
-          text: 'Invoice ${widget.billingHistory.invoiceNumber}',
+        final file = File(
+          '${directory.path}/invoice_${widget.billingHistory.invoiceNumber}.pdf',
         );
+        await file.writeAsBytes(pdfBytes);
+        await Share.shareXFiles([
+          XFile(file.path),
+        ], text: 'Invoice ${widget.billingHistory.invoiceNumber}');
       }
       debugPrint('[PDF] Invoice shared');
     } catch (e) {
       debugPrint('[PDF][ERROR] Error sharing invoice: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error sharing invoice: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error sharing invoice: $e')));
       }
     } finally {
       if (mounted) setState(() => isGenerating = false);
@@ -185,12 +174,16 @@ class _PdfInvoiceScreenState extends State<PdfInvoiceScreen> {
     setState(() => isGenerating = true);
 
     try {
-      final pdfBytes = _cachedPdfBytes ?? await PdfGenerator.generateInvoice(
-        widget.billingHistory,
-        PdfPageFormat.a4,
-      );
+      final pdfBytes =
+          _cachedPdfBytes ??
+          await PdfGenerator.generateInvoice(
+            widget.billingHistory,
+            PdfPageFormat.a4,
+          );
       final directory = await getApplicationDocumentsDirectory();
-      final file = File('${directory.path}/invoice_${widget.billingHistory.invoiceNumber}.pdf');
+      final file = File(
+        '${directory.path}/invoice_${widget.billingHistory.invoiceNumber}.pdf',
+      );
       await file.writeAsBytes(pdfBytes);
       lastSavedPath = file.path;
       if (mounted) {
@@ -202,9 +195,9 @@ class _PdfInvoiceScreenState extends State<PdfInvoiceScreen> {
     } catch (e) {
       debugPrint('[PDF][ERROR] Error saving invoice: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving invoice: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error saving invoice: $e')));
       }
     } finally {
       if (mounted) setState(() => isGenerating = false);

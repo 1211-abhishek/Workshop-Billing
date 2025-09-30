@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:responsive_builder/responsive_builder.dart';
 import '../database/db_helper.dart';
 import '../models/product.dart';
-import '../widgets/product_tile.dart';
 import 'add_edit_product_screen.dart';
-import '../responsive_layout.dart';
+import '../ui/responsive/manage_inventory_screen_desktop.dart';
+import '../ui/responsive/manage_inventory_screen_mobile.dart';
+import '../ui/responsive/manage_inventory_screen_tablet.dart';
 
 class ManageInventoryScreen extends StatefulWidget {
   const ManageInventoryScreen({super.key});
@@ -38,7 +40,7 @@ class _ManageInventoryScreenState extends State<ManageInventoryScreen> {
           .map((p) => p.category ?? 'Uncategorized')
           .toSet()
           .toList();
-      
+
       setState(() {
         products = loadedProducts;
         filteredProducts = loadedProducts;
@@ -50,9 +52,9 @@ class _ManageInventoryScreenState extends State<ManageInventoryScreen> {
         isLoading = false;
       });
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading products: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error loading products: $e')));
       }
     }
   }
@@ -61,8 +63,9 @@ class _ManageInventoryScreenState extends State<ManageInventoryScreen> {
     final query = searchController.text.toLowerCase();
     setState(() {
       filteredProducts = products.where((product) {
-        final matchesSearch = product.name.toLowerCase().contains(query) ||
-            (product.description?.toLowerCase().contains(query) ?? false);
+        final matchesSearch =
+            product.name.toLowerCase().contains(query) ||
+                (product.description?.toLowerCase().contains(query) ?? false);
         final matchesCategory = selectedCategory == 'All' ||
             (product.category ?? 'Uncategorized') == selectedCategory;
         return matchesSearch && matchesCategory;
@@ -70,7 +73,28 @@ class _ManageInventoryScreenState extends State<ManageInventoryScreen> {
     });
   }
 
-  Future<void> _deleteProduct(Product product) async {
+  void _onCategorySelected(String category) {
+    setState(() {
+      selectedCategory = category;
+    });
+    _filterProducts();
+  }
+
+  Future<void> _onEdit(Product product) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddEditProductScreen(
+          product: product,
+        ),
+      ),
+    );
+    if (result == true) {
+      _loadProducts();
+    }
+  }
+
+  Future<void> _onDelete(Product product) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -101,164 +125,72 @@ class _ManageInventoryScreenState extends State<ManageInventoryScreen> {
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error deleting product: $e')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Error deleting product: $e')));
         }
       }
+    }
+  }
+
+  void _onAdd() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AddEditProductScreen(),
+      ),
+    );
+    if (result == true) {
+      _loadProducts();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Manage Inventory'),
-      ),
-      body: ResponsiveLayout(
-        mobile: _buildMobile(context),
-        tablet: _buildTablet(context),
-        desktop: _buildDesktop(context),
+      appBar: AppBar(title: const Text('Manage Inventory')),
+      body: ScreenTypeLayout.builder(
+        mobile: (BuildContext context) => ManageInventoryScreenMobile(
+          products: products,
+          filteredProducts: filteredProducts,
+          isLoading: isLoading,
+          searchController: searchController,
+          selectedCategory: selectedCategory,
+          categories: categories,
+          onCategorySelected: _onCategorySelected,
+          onEdit: _onEdit,
+          onDelete: _onDelete,
+          onAdd: _onAdd,
+        ),
+        tablet: (BuildContext context) => ManageInventoryScreenTablet(
+          products: products,
+          filteredProducts: filteredProducts,
+          isLoading: isLoading,
+          searchController: searchController,
+          selectedCategory: selectedCategory,
+          categories: categories,
+          onCategorySelected: _onCategorySelected,
+          onEdit: _onEdit,
+          onDelete: _onDelete,
+          onAdd: _onAdd,
+        ),
+        desktop: (BuildContext context) => ManageInventoryScreenDesktop(
+          products: products,
+          filteredProducts: filteredProducts,
+          isLoading: isLoading,
+          searchController: searchController,
+          selectedCategory: selectedCategory,
+          categories: categories,
+          onCategorySelected: _onCategorySelected,
+          onEdit: _onEdit,
+          onDelete: _onDelete,
+          onAdd: _onAdd,
+        ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const AddEditProductScreen(),
-            ),
-          );
-          if (result == true) {
-            _loadProducts();
-          }
-        },
+        onPressed: _onAdd,
         tooltip: 'Add Product',
         child: const Icon(Icons.add),
-      ),
-    );
-  }
-
-  Widget _buildMobile(BuildContext context) {
-    return _mainContent(context, crossAxisCount: 1);
-  }
-
-  Widget _buildTablet(BuildContext context) {
-    return _mainContent(context, crossAxisCount: 2);
-  }
-
-  Widget _buildDesktop(BuildContext context) {
-    return _mainContent(context, crossAxisCount: 3);
-  }
-
-  Widget _mainContent(BuildContext context, {required int crossAxisCount}) {
-    return Center(
-      child: Column(
-        children: [
-          // Search and Filter Section
-          Container(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                TextField(
-                  controller: searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search products...',
-                    prefixIcon: const Icon(Icons.search_rounded),
-                    suffixIcon: searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear_rounded),
-                            onPressed: () {
-                              searchController.clear();
-                            },
-                          )
-                        : null,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: categories.map((category) {
-                      final isSelected = selectedCategory == category;
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: FilterChip(
-                          label: Text(category),
-                          selected: isSelected,
-                          onSelected: (selected) {
-                            setState(() {
-                              selectedCategory = category;
-                            });
-                            _filterProducts();
-                          },
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-      
-          // Products List
-          Expanded(
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : filteredProducts.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.inventory_2_outlined,
-                              size: 64,
-                              color: Colors.grey.shade400,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              products.isEmpty ? 'No products found' : 'No matching products',
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: Colors.grey.shade600,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              products.isEmpty 
-                                  ? 'Tap + to add your first product'
-                                  : 'Try adjusting your search or filters',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Colors.grey.shade500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : GridView.count(
-                        //padding: const EdgeInsets.symmetric(horizontal: 6),
-                        crossAxisCount: crossAxisCount,
-                        childAspectRatio: 3, // Adjusted for ProductTile's width/height
-                        mainAxisSpacing: 16,
-                        crossAxisSpacing: 16,
-                        children: filteredProducts.map((product) {
-                          return ProductTile(
-                            product: product,
-                            onEdit: () async {
-                              final result = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => AddEditProductScreen(product: product),
-                                ),
-                              );
-                              if (result == true) {
-                                _loadProducts();
-                              }
-                            },
-                            onDelete: () => _deleteProduct(product),
-                          );
-                        }).toList(),
-                      ),
-          ),
-        ],
       ),
     );
   }

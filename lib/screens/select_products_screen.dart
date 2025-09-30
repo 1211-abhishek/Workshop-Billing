@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../database/db_helper.dart';
 import '../models/product.dart';
 import '../widgets/product_tile.dart';
-import '../responsive_layout.dart';
 
 class SelectProductsScreen extends StatefulWidget {
   const SelectProductsScreen({super.key});
@@ -145,24 +144,17 @@ class _SelectProductsScreenState extends State<SelectProductsScreen> {
           ),
         ],
       ),
-      body: ResponsiveLayout(
-        mobile: _buildMobile(context),
-        tablet: _buildTablet(context),
-        desktop: _buildDesktop(context),
-      ),
+      body: LayoutBuilder(builder: (context, constraints) {
+        return _mainContent(context,
+            crossAxisCount: constraints.maxWidth > 1200
+                ? 4
+                : constraints.maxWidth > 800
+                    ? 3
+                    : constraints.maxWidth > 600
+                        ? 2
+                        : 1);
+      }),
     );
-  }
-
-  Widget _buildMobile(BuildContext context) {
-    return _mainContent(context, crossAxisCount: 1);
-  }
-
-  Widget _buildTablet(BuildContext context) {
-    return _mainContent(context, crossAxisCount: 2);
-  }
-
-  Widget _buildDesktop(BuildContext context) {
-    return _mainContent(context, crossAxisCount: 3);
   }
 
   Widget _mainContent(BuildContext context, {required int crossAxisCount}) {
@@ -308,24 +300,27 @@ class _SelectProductsScreenState extends State<SelectProductsScreen> {
                           ],
                         ),
                       )
-                      : GridView.count(
-                        childAspectRatio: 3,
+                      : GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCount,
+                          childAspectRatio: 3,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                        ),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 8,
                         ),
-                        crossAxisCount: crossAxisCount,
-                        mainAxisSpacing: 12,
-                        crossAxisSpacing: 12,
-                        children:
-                            filteredProducts.map((product) {
-                              return ProductTile(
-                                product: product,
-                                showSelectionToggle: true,
-                                onToggleSelection:
-                                    () => _toggleProductSelection(product),
-                              );
-                            }).toList(),
+                        itemCount: filteredProducts.length,
+                        itemBuilder: (context, index) {
+                          final product = filteredProducts[index];
+                          return ProductTile(
+                            product: product,
+                            showSelectionToggle: true,
+                            onToggleSelection:
+                                () => _toggleProductSelection(product),
+                          );
+                        },
                       ),
             ),
           ],

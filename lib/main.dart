@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'screens/home_screen.dart';
 import 'database/db_helper.dart';
-import 'dart:io';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'platform_init.dart' if (dart.library.io) 'platform_init_io.dart';
+import 'providers/billing_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (Platform.isWindows) {
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
-  }
+  platformInit();
 
   // Initialize database
   await DatabaseHelper.instance.database;
@@ -24,7 +22,12 @@ void main() async {
     ),
   );
 
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => BillingProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -40,6 +43,22 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF2196F3),
           brightness: Brightness.light,
+        ),
+        fontFamily: 'Nunito',
+        textTheme: const TextTheme(
+          displayLarge: TextStyle(fontSize: 96, fontWeight: FontWeight.bold),
+          displayMedium: TextStyle(fontSize: 60, fontWeight: FontWeight.bold),
+          displaySmall: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+          headlineMedium: TextStyle(fontSize: 34, fontWeight: FontWeight.bold),
+          headlineSmall: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          titleLarge: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          titleMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          titleSmall: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          bodyLarge: TextStyle(fontSize: 16),
+          bodyMedium: TextStyle(fontSize: 14),
+          labelLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          bodySmall: TextStyle(fontSize: 12),
+          labelSmall: TextStyle(fontSize: 10),
         ),
         cardTheme: CardThemeData(
           elevation: 2,
