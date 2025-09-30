@@ -14,7 +14,8 @@ class BackupService {
     try {
       final products = await DatabaseHelper.instance.getAllProducts();
       final jsonData = products.map((product) => product.toMap()).toList();
-      
+
+      if (!context.mounted) return;
       await _exportToFile(
         context,
         'products_backup_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.json',
@@ -22,6 +23,7 @@ class BackupService {
         'Products exported successfully',
       );
     } catch (e) {
+      if (!context.mounted) return;
       _showError(context, 'Failed to export products: $e');
     }
   }
@@ -31,6 +33,7 @@ class BackupService {
       final customers = await DatabaseHelper.instance.getAllCustomers();
       final jsonData = customers.map((customer) => customer.toMap()).toList();
       
+      if (!context.mounted) return;
       await _exportToFile(
         context,
         'customers_backup_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.json',
@@ -38,6 +41,7 @@ class BackupService {
         'Customers exported successfully',
       );
     } catch (e) {
+      if (!context.mounted) return;
       _showError(context, 'Failed to export customers: $e');
     }
   }
@@ -51,6 +55,7 @@ class BackupService {
         return map;
       }).toList();
       
+      if (!context.mounted) return;
       await _exportToFile(
         context,
         'billing_history_backup_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.json',
@@ -58,6 +63,7 @@ class BackupService {
         'Billing history exported successfully',
       );
     } catch (e) {
+      if (!context.mounted) return;
       _showError(context, 'Failed to export billing history: $e');
     }
   }
@@ -80,6 +86,7 @@ class BackupService {
         'version': '1.0',
       };
       
+      if (!context.mounted) return;
       await _exportToFile(
         context,
         'complete_backup_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.json',
@@ -87,6 +94,7 @@ class BackupService {
         'Complete backup exported successfully',
       );
     } catch (e) {
+      if (!context.mounted) return;
       _showError(context, 'Failed to export complete backup: $e');
     }
   }
@@ -140,6 +148,7 @@ class BackupService {
         );
       }
     } catch (e) {
+      if (!context.mounted) return;
       _showError(context, 'Failed to import products: $e');
     }
   }
@@ -159,6 +168,7 @@ class BackupService {
         );
       }
     } catch (e) {
+      if (!context.mounted) return;
       _showError(context, 'Failed to import customers: $e');
     }
   }
@@ -170,8 +180,10 @@ class BackupService {
       if (file == null) return;
 
       final content = await file.readAsString();
+      if (!context.mounted) return;
       await importProducts(context, content);
     } catch (e) {
+      if (!context.mounted) return;
       _showError(context, 'Failed to import products: $e');
     }
   }
@@ -183,8 +195,10 @@ class BackupService {
       if (file == null) return;
 
       final content = await file.readAsString();
+      if (!context.mounted) return;
       await importCustomers(context, content);
     } catch (e) {
+      if (!context.mounted) return;
       _showError(context, 'Failed to import customers: $e');
     }
   }

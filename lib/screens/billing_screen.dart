@@ -7,6 +7,9 @@ import '../models/billing_history.dart';
 import '../widgets/billing_item_card.dart';
 import '../responsive_layout.dart';
 import '../widgets/custom_text_field.dart';
+import 'package:logging/logging.dart';
+
+final _log = Logger('BillingScreen');
 
 class BillingScreen extends StatefulWidget {
   const BillingScreen({super.key});
@@ -236,9 +239,9 @@ class _BillingScreenState extends State<BillingScreen> {
 
   Future<void> _debugPrintBills() async {
     final bills = await DatabaseHelper.instance.debugGetAllBills();
-    print('[DEBUG] All bills in DB:');
+    _log.info('[DEBUG] All bills in DB:');
     for (final bill in bills) {
-      print(bill);
+      _log.info(bill.toString());
     }
   }
 

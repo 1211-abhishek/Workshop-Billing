@@ -99,6 +99,13 @@ class _BillingHistoryScreenState extends State<BillingHistoryScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Billing History'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.date_range_rounded),
+            onPressed: _selectDateRange,
+            tooltip: 'Select Date Range',
+          ),
+        ],
       ),
       body: ResponsiveLayout(
         mobile: _buildMobile(context),
@@ -286,7 +293,7 @@ class _BillingHistoryScreenState extends State<BillingHistoryScreen> {
                               width: 50,
                               height: 50,
                               decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                                color: Theme.of(context).colorScheme.primary.withAlpha(25), // Replaced withOpacity
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Icon(

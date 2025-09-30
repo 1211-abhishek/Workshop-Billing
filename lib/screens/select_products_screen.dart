@@ -134,8 +134,17 @@ class _SelectProductsScreenState extends State<SelectProductsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final allSelected = filteredProducts.every((p) => p.isSelectedForBilling);
     return Scaffold(
-      appBar: AppBar(title: const Text('Select Products')),
+      appBar: AppBar(
+        title: const Text('Select Products'),
+        actions: [
+          TextButton(
+            onPressed: () => _selectAllProducts(!allSelected),
+            child: Text(allSelected ? 'Deselect All' : 'Select All'),
+          ),
+        ],
+      ),
       body: ResponsiveLayout(
         mobile: _buildMobile(context),
         tablet: _buildTablet(context),

@@ -5,6 +5,9 @@ import 'package:path/path.dart';
 import '../models/product.dart';
 import '../models/customer.dart';
 import '../models/billing_history.dart';
+import 'package:logging/logging.dart';
+
+final _log = Logger('DatabaseHelper');
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -19,9 +22,9 @@ class DatabaseHelper {
   }
 
   Future<Database> _initDB(String filePath) async {
-     final appDocDir = await getApplicationDocumentsDirectory();
-  final path = join(appDocDir.path, filePath);
-    print('[DB] Database path: $path');
+    final appDocDir = await getApplicationDocumentsDirectory();
+    final path = join(appDocDir.path, filePath);
+    _log.info('[DB] Database path: $path');
     return await openDatabase(
       path,
       version: 1,
@@ -218,17 +221,17 @@ class DatabaseHelper {
   Future<int> insertBillingHistory(BillingHistory billing) async {
     final db = await instance.database;
     try {
-      print('[DB] Inserting billing history: invoiceNumber=${billing.invoiceNumber}');
+      _log.info('[DB] Inserting billing history: invoiceNumber=${billing.invoiceNumber}');
       final id = await db.insert('billing_history', billing.toMap());
-      print('[DB] Inserted billing_history id: $id');
+      _log.info('[DB] Inserted billing_history id: $id');
       // Insert billing items
       for (BillingItem item in billing.items) {
-        print('[DB] Inserting billing item for billingHistoryId=$id, productName=${item.productName}');
+        _log.info('[DB] Inserting billing item for billingHistoryId=$id, productName=${item.productName}');
         await db.insert('billing_items', item.copyWith(billingHistoryId: id).toMap());
       }
       return id;
     } catch (e) {
-      print('[DB][ERROR] Failed to insert billing history: $e');
+      _log.severe('[DB][ERROR] Failed to insert billing history: $e');
       rethrow;
     }
   }
@@ -273,13 +276,13 @@ class DatabaseHelper {
       final seqStr = lastInvoice.substring(datePrefix.length);
       final lastSeq = int.tryParse(seqStr) ?? 0;
       nextSeq = lastSeq + 1;
-      print('[DB] Last invoice for today: $lastInvoice, lastSeq: $lastSeq, nextSeq: $nextSeq');
+      _log.info('[DB] Last invoice for today: $lastInvoice, lastSeq: $lastSeq, nextSeq: $nextSeq');
     } else {
-      print('[DB] No invoice found for today, starting with 1');
+      _log.info('[DB] No invoice found for today, starting with 1');
     }
 
     final invoiceNumber = '$datePrefix${nextSeq.toString().padLeft(3, '0')}';
-    print('[DB] Generated invoice number: $invoiceNumber');
+    _log.info('[DB] Generated invoice number: $invoiceNumber');
     return invoiceNumber;
   }
 

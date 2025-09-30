@@ -49,7 +49,7 @@ class CustomCard extends StatelessWidget {
           ),
           elevation: 2,
           margin: const EdgeInsets.all(8),
-          shadowColor: Colors.black.withOpacity(0.1),
+          shadowColor: Colors.black.withAlpha(25),
           child: InkWell(
             onTap: onTap,
             borderRadius: BorderRadius.circular(16),
@@ -66,7 +66,7 @@ class CustomCard extends StatelessWidget {
                         padding: EdgeInsets.all(padding / 2),
                         decoration: BoxDecoration(
                           color: (iconColor ?? Theme.of(context).colorScheme.primary)
-                              .withOpacity(0.1),
+                              .withAlpha(25),
                           borderRadius: BorderRadius.circular(5),
                         ),
                         child: Icon(

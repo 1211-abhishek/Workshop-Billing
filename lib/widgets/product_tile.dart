@@ -22,25 +22,19 @@ class ProductTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     double cardWidth;
-    double cardHeight;
     double iconSize;
-    double padding;
     double fontSize;
     if (width < 500) {
       cardWidth = double.infinity;
       iconSize = 32;
-      padding = 12;
       fontSize = 14;
     } else if (width < 800) {
       cardWidth = 350;
       iconSize = 40;
-      padding = 16;
       fontSize = 16;
     } else {
       cardWidth = 350;
-      cardHeight = 200;
       iconSize = 48;
-      padding = 10;
       fontSize = 18;
     }
     return Center(
@@ -53,9 +47,9 @@ class ProductTile extends StatelessWidget {
           ),
           margin: const EdgeInsets.all(0),
           elevation: 2,
-          shadowColor: Colors.black.withOpacity(0.1),
+          shadowColor: Colors.black.withAlpha(25), // Replaced withOpacity
           child: Padding(
-            padding: EdgeInsets.all(5),
+            padding: const EdgeInsets.all(5),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,7 +61,7 @@ class ProductTile extends StatelessWidget {
                       width: 50,
                       height: 50,
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                        color: Theme.of(context).colorScheme.primary.withAlpha(25), // Replaced withOpacity
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(

@@ -22,7 +22,7 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       //margin: const EdgeInsets.symmetric(vertical: 8.0),
       height: 45,
       //alignment: Alignment(1, 1),

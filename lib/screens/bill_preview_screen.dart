@@ -7,7 +7,6 @@ import 'package:printing/printing.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'package:cross_file/cross_file.dart';
 import 'dart:typed_data';
 
 class BillPreviewScreen extends StatefulWidget {
@@ -38,12 +37,13 @@ class _BillPreviewScreenState extends State<BillPreviewScreen> {
         });
       }
     } catch (e) {
-      if (mounted) {
-        setState(() => isGenerating = false);
-      }
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error generating PDF: $e')),
       );
+      if (mounted) {
+        setState(() => isGenerating = false);
+      }
     }
   }
 
@@ -53,11 +53,14 @@ class _BillPreviewScreenState extends State<BillPreviewScreen> {
     try {
       await Printing.layoutPdf(onLayout: (_) async => _pdfBytes!);
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error printing PDF: $e')),
       );
     } finally {
-      setState(() => isGenerating = false);
+      if (mounted) {
+        setState(() => isGenerating = false);
+      }
     }
   }
 
@@ -73,11 +76,14 @@ class _BillPreviewScreenState extends State<BillPreviewScreen> {
         text: 'Invoice ${widget.billingHistory.invoiceNumber}',
       );
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error sharing PDF: $e')),
       );
     } finally {
-      setState(() => isGenerating = false);
+      if (mounted) {
+        setState(() => isGenerating = false);
+      }
     }
   }
 

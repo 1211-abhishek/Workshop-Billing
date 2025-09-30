@@ -41,7 +41,7 @@ class AdminScreen extends StatelessWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Theme.of(context).colorScheme.primary.withOpacity(0.05),
+                Theme.of(context).colorScheme.primary.withAlpha(12),
                 Colors.white,
               ],
             ),
@@ -71,7 +71,7 @@ class AdminScreen extends StatelessWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Theme.of(context).colorScheme.primary.withOpacity(0.05),
+                Theme.of(context).colorScheme.primary.withAlpha(12),
                 Colors.white,
               ],
             ),
@@ -99,7 +99,7 @@ class AdminScreen extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Theme.of(context).colorScheme.primary.withOpacity(0.05),
+              Theme.of(context).colorScheme.primary.withAlpha(12),
               Colors.white,
             ],
           ),

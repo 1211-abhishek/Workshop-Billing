@@ -160,7 +160,7 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
                       children: [
                         Expanded(
                           child: DropdownButtonFormField<String>(
-                            value: categories.contains(_categoryController.text) 
+                            initialValue: categories.contains(_categoryController.text) 
                                 ? _categoryController.text 
                                 : null,
                             decoration: const InputDecoration(
@@ -181,7 +181,7 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
                         const SizedBox(width: 16),
                         Expanded(
                           child: DropdownButtonFormField<String>(
-                            value: selectedUnit,
+                            initialValue: selectedUnit,
                             decoration: const InputDecoration(
                               labelText: 'Unit',
                               prefixIcon: Icon(Icons.straighten_rounded),

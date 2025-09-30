@@ -20,9 +20,9 @@ dependencies:
   cupertino_icons: ^1.0.2
   cross_file: ^0.3.4+2
   file_selector: ^1.0.3
-  open_file: ^3.5.10
   sqflite_common_ffi: ^2.3.6
   open_filex: ^4.7.0
+  logging: ^1.2.0
   
 dev_dependencies:
   flutter_test:

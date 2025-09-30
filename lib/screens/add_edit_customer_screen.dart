@@ -102,6 +102,11 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
         tablet: _buildForm(context, padding: 48),
         desktop: _buildForm(context, padding: 120),
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: isLoading ? null : _saveCustomer,
+        label: const Text('Save Customer'),
+        icon: isLoading ? const CircularProgressIndicator(strokeWidth: 2) : const Icon(Icons.save_rounded),
+      ),
     );
   }
 
