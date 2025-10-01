@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_billing_system/screens/profile_screen.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import '../ui/responsive/home_screen_desktop.dart';
 import '../ui/responsive/home_screen_mobile.dart';
@@ -21,6 +22,20 @@ class HomeScreen extends StatelessWidget {
           style: Theme.of(context).textTheme.headlineSmall,
         ),
         actions: [
+          IconButton(
+            icon: Icon(
+              Icons.person_outline,
+              color: Theme.of(context).colorScheme.primary,
+              size: 32,
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              );
+            },
+            tooltip: 'Business Profile',
+          ),
           IconButton(
             icon: Icon(
               Icons.account_circle_rounded,
@@ -52,7 +67,7 @@ class HomeScreen extends StatelessWidget {
           padding: const EdgeInsets.all(24.0),
           child: ScreenTypeLayout.builder(
             mobile: (BuildContext context) => const HomeScreenMobile(),
-            tablet: (BuildContext context) => const HomeScreenTablet(),
+            tablet: (BuildContext antext) => const HomeScreenTablet(),
             desktop: (BuildContext context) => const HomeScreenDesktop(),
           ),
         ),

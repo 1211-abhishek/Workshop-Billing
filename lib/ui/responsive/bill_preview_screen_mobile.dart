@@ -21,41 +21,49 @@ class BillPreviewScreenMobile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Column(
-          children: [
-            Expanded(child: BillWidgetPreview(billingHistory: billingHistory)),
-            Padding(
-              padding: const EdgeInsets.all(16),
+    return Scaffold(
+      body: Stack(
+        children: [
+          BillWidgetPreview(billingHistory: billingHistory),
+          if (isGenerating && pdfBytes == null)
+            Container(
+              color: Colors.black.withOpacity(0.5),
+              child: const Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text('Generating PDF...', style: TextStyle(color: Colors.white)),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
+      floatingActionButton: isGenerating
+          ? null
+          : Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  ElevatedButton.icon(
-                    onPressed: (!isGenerating && pdfBytes != null)
-                        ? () => onPrint()
-                        : null,
-                    icon: const Icon(Icons.print),
-                    label: const Text('Print PDF'),
+                  FloatingActionButton(
+                    onPressed: () => onShare(),
+                    heroTag: 'share_fab',
+                    tooltip: 'Share PDF',
+                    child: const Icon(Icons.share),
                   ),
-                  ElevatedButton.icon(
-                    onPressed: (!isGenerating && pdfBytes != null)
-                        ? () => onShare()
-                        : null,
-                    icon: const Icon(Icons.share),
-                    label: const Text('Share PDF'),
+                  const SizedBox(width: 16),
+                  FloatingActionButton(
+                    onPressed: () => onPrint(),
+                    heroTag: 'print_fab',
+                    tooltip: 'Print PDF',
+                    child: const Icon(Icons.print),
                   ),
                 ],
               ),
             ),
-          ],
-        ),
-        if (isGenerating && pdfBytes == null)
-          Container(
-            color: Colors.black.withAlpha(25),
-            child: const Center(child: CircularProgressIndicator()),
-          ),
-      ],
     );
   }
 }
