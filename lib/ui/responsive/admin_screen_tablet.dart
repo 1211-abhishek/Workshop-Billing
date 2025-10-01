@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_billing_system/screens/manage_customers_screen.dart';
 import 'package:flutter_billing_system/screens/manage_inventory_screen.dart';
-import 'package:flutter_billing_system/screens/reports_screen.dart';
 import 'package:flutter_billing_system/services/backup_service.dart';
 
 class AdminScreenTablet extends StatelessWidget {
@@ -32,17 +31,6 @@ class AdminScreenTablet extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) => const ManageCustomersScreen(),
-            ),
-          ),
-        ),
-        _buildAdminCard(
-          context,
-          icon: Icons.bar_chart_rounded,
-          title: 'Reports',
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const ReportsScreen(),
             ),
           ),
         ),

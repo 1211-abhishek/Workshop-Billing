@@ -52,7 +52,7 @@ class BillPreviewScreenMobile extends StatelessWidget {
         ),
         if (isGenerating && pdfBytes == null)
           Container(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withAlpha(25),
             child: const Center(child: CircularProgressIndicator()),
           ),
       ],

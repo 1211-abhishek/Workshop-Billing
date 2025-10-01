@@ -35,7 +35,7 @@ class ProductListItem extends StatelessWidget {
                         ),
                         fit: BoxFit.contain,
                         colorFilter: ColorFilter.mode(
-                          Colors.grey.shade200.withOpacity(0.5),
+                          Colors.grey.shade200.withAlpha(128),
                           BlendMode.dstATop,
                         ),
                       )

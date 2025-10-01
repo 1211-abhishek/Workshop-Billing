@@ -28,8 +28,6 @@ class SelectProductsScreenMobile extends StatelessWidget {
   Widget build(BuildContext context) {
     final selectedCount =
         filteredProducts.where((p) => p.isSelectedForBilling).length;
-    final allSelected = filteredProducts.isNotEmpty &&
-        filteredProducts.every((p) => p.isSelectedForBilling);
 
     return Column(
       children: [

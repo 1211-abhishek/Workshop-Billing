@@ -112,7 +112,7 @@ class _BillingScreenMobileState extends State<BillingScreenMobile> {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withAlpha(20),
             blurRadius: 12.r,
             offset: Offset(0, 4.h),
           ),

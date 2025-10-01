@@ -6,6 +6,7 @@ import 'screens/home_screen.dart';
 import 'database/db_helper.dart';
 import 'platform_init.dart' if (dart.library.io) 'platform_init_io.dart';
 import 'providers/billing_provider.dart';
+import 'providers/billing_history_provider.dart';
 import 'theme.dart';
 
 void main() async {
@@ -25,8 +26,11 @@ void main() async {
   );
 
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => BillingProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => BillingProvider()),
+        ChangeNotifierProvider(create: (context) => BillingHistoryProvider()),
+      ],
       child: const MyApp(),
     ),
   );

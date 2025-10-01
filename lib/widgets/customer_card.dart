@@ -22,7 +22,7 @@ class CustomerCard extends StatelessWidget {
         leading: CircleAvatar(
           backgroundColor: Theme.of(
             context,
-          ).colorScheme.primary.withOpacity(0.1),
+          ).colorScheme.primary.withAlpha(25),
           child: Text(
             customer.name.isNotEmpty ? customer.name[0].toUpperCase() : '?',
             style: TextStyle(
