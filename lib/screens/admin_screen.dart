@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import '../ui/responsive/admin_screen_desktop.dart';
 import '../ui/responsive/admin_screen_mobile.dart';
@@ -34,7 +35,7 @@ class AdminScreen extends StatelessWidget {
             ),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(16.w),
             child: ScreenTypeLayout.builder(
               mobile: (BuildContext context) => const AdminScreenMobile(),
               tablet: (BuildContext context) => const AdminScreenTablet(),

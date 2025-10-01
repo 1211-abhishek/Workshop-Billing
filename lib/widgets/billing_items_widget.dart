@@ -4,6 +4,7 @@ import 'package:flutter_billing_system/models/product.dart';
 import 'package:flutter_billing_system/providers/billing_provider.dart';
 import 'package:flutter_billing_system/widgets/billing_item_card.dart';
 import 'package:flutter_billing_system/widgets/custom_text_field.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 class BillingItemsWidget extends StatelessWidget {
@@ -19,13 +20,13 @@ class BillingItemsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.all(16),
+      margin: EdgeInsets.all(16.w),
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
       child: Padding(
-        padding: const EdgeInsets.all(10),
+        padding: EdgeInsets.all(10.w),
         child: SizedBox(
-          height: isMobile ? 300 : 700,
+          height: isMobile ? 300.h : 700.h,
           child: Consumer<BillingProvider>(
             builder: (context, billingProvider, child) {
               if (billingProvider.items.isEmpty) {
@@ -35,7 +36,7 @@ class BillingItemsWidget extends StatelessWidget {
                     children: [
                       Icon(
                         Icons.shopping_cart_outlined,
-                        size: 64,
+                        size: 64.sp,
                         color: Colors.grey.shade400,
                       ),
                       Text(
@@ -54,7 +55,7 @@ class BillingItemsWidget extends StatelessWidget {
                 itemBuilder: (context, index) {
                   if (index == billingProvider.items.length) {
                     return Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: EdgeInsets.all(8.0.w),
                       child: ElevatedButton.icon(
                         onPressed: () {
                           _showAddProductDialog(context);
@@ -66,7 +67,7 @@ class BillingItemsWidget extends StatelessWidget {
                   }
                   final item = billingProvider.items[index];
                   return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 2),
+                    padding: EdgeInsets.symmetric(vertical: 2.h),
                     child: BillingItemCard(
                       item: item,
                       onRemove: () {

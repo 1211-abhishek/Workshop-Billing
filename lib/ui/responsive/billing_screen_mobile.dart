@@ -5,6 +5,7 @@ import 'package:flutter_billing_system/providers/billing_provider.dart';
 import 'package:flutter_billing_system/widgets/billing_item_card.dart';
 import 'package:flutter_billing_system/widgets/custom_text_field.dart';
 import 'package:flutter_billing_system/widgets/summary_widget.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -73,7 +74,7 @@ class _BillingScreenMobileState extends State<BillingScreenMobile> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 16.h),
         child: Column(
           children: [
             _headerBanner(context),
@@ -97,8 +98,8 @@ class _BillingScreenMobileState extends State<BillingScreenMobile> {
   Widget _headerBanner(BuildContext context) {
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+      margin: EdgeInsets.only(bottom: 16.h),
+      padding: EdgeInsets.symmetric(vertical: 24.h, horizontal: 16.w),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -108,19 +109,19 @@ class _BillingScreenMobileState extends State<BillingScreenMobile> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            blurRadius: 12.r,
+            offset: Offset(0, 4.h),
           ),
         ],
       ),
       child: Row(
         children: [
-          const Icon(Icons.receipt_long_rounded, color: Colors.white, size: 36),
-          const SizedBox(width: 16),
+          Icon(Icons.receipt_long_rounded, color: Colors.white, size: 36.sp),
+          SizedBox(width: 16.w),
           Text(
             'Create Bill',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -135,14 +136,14 @@ class _BillingScreenMobileState extends State<BillingScreenMobile> {
 
   Widget _customerDetails(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.all(16),
+      margin: EdgeInsets.all(16.w),
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
       child: SizedBox(
-        height: 700, // fixed height for scrollable content
+        height: 700.h, // fixed height for scrollable content
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(20.w),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -151,71 +152,71 @@ class _BillingScreenMobileState extends State<BillingScreenMobile> {
                   controller: widget.serialNumberController,
                   labelText: 'Serial Number',
                 ),
-                const SizedBox(height: 15),
+                SizedBox(height: 15.h),
                 Text(
                   'Customer Details',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: 10.h),
                 CustomTextField(
                   controller: widget.customerNameController,
                   labelText: 'Customer Name',
                 ),
-                const SizedBox(height: 15),
+                SizedBox(height: 15.h),
                 CustomTextField(
                   controller: widget.customerContactController,
                   labelText: 'Contact',
                   keyboardType: TextInputType.phone,
                 ),
-                const SizedBox(height: 15),
+                SizedBox(height: 15.h),
                 CustomTextField(
                   controller: widget.customerAddressController,
                   labelText: 'Address',
                   maxLines: 2,
                 ),
-                const SizedBox(height: 15),
+                SizedBox(height: 15.h),
                 Text(
                   'Machine Info',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: 10.h),
                 CustomTextField(
                   controller: widget.engineTypeController,
                   labelText: 'Engine Type',
                 ),
-                const SizedBox(height: 15),
+                SizedBox(height: 15.h),
                 CustomTextField(
                     controller: widget.pumpController, labelText: 'Pump'),
-                const SizedBox(height: 15),
+                SizedBox(height: 15.h),
                 CustomTextField(
                   controller: widget.governorController,
                   labelText: 'Governor',
                 ),
-                const SizedBox(height: 15),
+                SizedBox(height: 15.h),
                 CustomTextField(
                   controller: widget.feedPumpController,
                   labelText: 'Feed Pump',
                 ),
-                const SizedBox(height: 15),
+                SizedBox(height: 15.h),
                 CustomTextField(
                   controller: widget.noozelHolderController,
                   labelText: 'Noozel Holder',
                 ),
-                const SizedBox(height: 15),
+                SizedBox(height: 15.h),
                 CustomTextField(
                   controller: widget.vehicleNumberController,
                   labelText: 'Vehicle Number',
                 ),
-                const SizedBox(height: 15),
+                SizedBox(height: 15.h),
                 CustomTextField(
                   controller: widget.mechanicNameController,
                   labelText: 'Mechanic Name',
                 ),
-                const SizedBox(height: 15),
+                SizedBox(height: 15.h),
                 Row(
                   children: [
                     Expanded(
@@ -234,7 +235,7 @@ class _BillingScreenMobileState extends State<BillingScreenMobile> {
                         },
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8.w),
                     Expanded(
                       child: _datePickerField(
                         context,
@@ -253,7 +254,7 @@ class _BillingScreenMobileState extends State<BillingScreenMobile> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 15),
+                SizedBox(height: 15.h),
                 _datePickerField(
                   context,
                   label: 'Billing Date',
@@ -297,13 +298,13 @@ class _BillingScreenMobileState extends State<BillingScreenMobile> {
 
   Widget _billingItemsWidget(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.all(16),
+      margin: EdgeInsets.all(16.w),
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
       child: Padding(
-        padding: const EdgeInsets.all(10),
+        padding: EdgeInsets.all(10.w),
         child: SizedBox(
-          height: 300,
+          height: 300.h,
           child: Consumer<BillingProvider>(
             builder: (context, billingProvider, child) {
               if (billingProvider.items.isEmpty) {
@@ -313,7 +314,7 @@ class _BillingScreenMobileState extends State<BillingScreenMobile> {
                     children: [
                       Icon(
                         Icons.shopping_cart_outlined,
-                        size: 64,
+                        size: 64.sp,
                         color: Colors.grey.shade400,
                       ),
                       Text(
@@ -332,7 +333,7 @@ class _BillingScreenMobileState extends State<BillingScreenMobile> {
                 itemBuilder: (context, index) {
                   if (index == billingProvider.items.length) {
                     return Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: EdgeInsets.all(8.w),
                       child: ElevatedButton.icon(
                         onPressed: () {
                           _showAddProductDialog();
@@ -344,7 +345,7 @@ class _BillingScreenMobileState extends State<BillingScreenMobile> {
                   }
                   final item = billingProvider.items[index];
                   return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 2),
+                    padding: EdgeInsets.symmetric(vertical: 2.h),
                     child: BillingItemCard(
                       item: item,
                       onRemove: () {

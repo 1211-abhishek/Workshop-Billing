@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../database/db_helper.dart';
 import '../models/customer.dart';
 
@@ -111,10 +112,7 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
       appBar: AppBar(
         title: Text(widget.customer == null ? 'Add Customer' : 'Edit Customer'),
       ),
-      body: LayoutBuilder(builder: (context, constraints) {
-        return _buildForm(context,
-            padding: constraints.maxWidth > 600 ? 48 : 16);
-      }),
+      body: _buildForm(context),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: isLoading ? null : _saveCustomer,
         label: const Text('Save Customer'),
@@ -126,12 +124,12 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
     );
   }
 
-  Widget _buildForm(BuildContext context, {required double padding}) {
+  Widget _buildForm(BuildContext context) {
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 500, maxHeight: 700),
+        constraints: BoxConstraints(maxWidth: 500.w, maxHeight: 700.h),
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(padding),
+          padding: EdgeInsets.all(16.w),
           child: Form(
             key: _formKey,
             child: Column(
@@ -139,7 +137,7 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
               children: [
                 Card(
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(16.w),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -148,7 +146,7 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: 16.h),
                         TextFormField(
                           controller: _nameController,
                           decoration: const InputDecoration(
@@ -162,7 +160,7 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: 16.h),
                         TextFormField(
                           controller: _contactController,
                           decoration: const InputDecoration(
@@ -179,7 +177,7 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: 16.h),
                         TextFormField(
                           controller: _emailController,
                           decoration: const InputDecoration(
@@ -190,7 +188,7 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
                           validator: (value) {
                             if (value != null && value.trim().isNotEmpty) {
                               if (!RegExp(
-                                r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                                r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$'
                               ).hasMatch(value)) {
                                 return 'Please enter valid email address';
                               }
@@ -198,7 +196,7 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: 16.h),
                         TextFormField(
                           controller: _addressController,
                           decoration: const InputDecoration(
@@ -211,10 +209,10 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 Card(
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(16.w),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -223,7 +221,7 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: 16.h),
                         TextFormField(
                           controller: _gstController,
                           decoration: const InputDecoration(
@@ -241,7 +239,7 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: 16.h),
                         TextFormField(
                           controller: _remarksController,
                           decoration: const InputDecoration(

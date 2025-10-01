@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_billing_system/models/billing_item_data.dart';
 import 'package:flutter_billing_system/screens/bill_preview_screen.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../database/db_helper.dart';
 import '../models/product.dart';

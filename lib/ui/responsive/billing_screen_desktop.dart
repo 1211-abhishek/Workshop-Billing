@@ -3,6 +3,7 @@ import 'package:flutter_billing_system/models/product.dart';
 import 'package:flutter_billing_system/widgets/billing_items_widget.dart';
 import 'package:flutter_billing_system/widgets/customer_details_widget.dart';
 import 'package:flutter_billing_system/widgets/summary_widget.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class BillingScreenDesktop extends StatelessWidget {
   final Function onGenerateInvoice;
@@ -64,7 +65,7 @@ class BillingScreenDesktop extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1300),
+        constraints: BoxConstraints(maxWidth: 1300.w),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -90,12 +91,12 @@ class BillingScreenDesktop extends StatelessWidget {
                 onBillingDateChanged: onBillingDateChanged,
               ),
             ),
-            const SizedBox(width: 24),
+            SizedBox(width: 24.w),
             Flexible(
               flex: 4,
               child: BillingItemsWidget(availableProducts: availableProducts),
             ),
-            const SizedBox(width: 24),
+            SizedBox(width: 24.w),
             Flexible(
               flex: 2,
               child: SummaryWidget(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_billing_system/models/billing_item_data.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/billing_provider.dart';
@@ -15,10 +16,10 @@ class BillingItemCard extends StatelessWidget {
     final billingProvider = Provider.of<BillingProvider>(context, listen: false);
     return Card(
       elevation: 2,
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -29,9 +30,9 @@ class BillingItemCard extends StatelessWidget {
                 IconButton(icon: const Icon(Icons.delete, color: Colors.red), onPressed: onRemove),
               ],
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.h),
             Text('Price: ₹${item.unitPrice.toStringAsFixed(2)}'),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -60,7 +61,7 @@ class BillingItemCard extends StatelessWidget {
                 ),
               ],
             ),
-            const Divider(height: 24, thickness: 1),
+            Divider(height: 24.h, thickness: 1.w),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

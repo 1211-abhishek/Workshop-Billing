@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AddEditProductScreenLarge extends StatelessWidget {
   final GlobalKey<FormState> formKey;
@@ -41,7 +42,7 @@ class AddEditProductScreenLarge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(48),
+      padding: EdgeInsets.all(48.w),
       child: Form(
         key: formKey,
         child: Column(
@@ -49,7 +50,7 @@ class AddEditProductScreenLarge extends StatelessWidget {
           children: [
             Card(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(16.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -59,7 +60,7 @@ class AddEditProductScreenLarge extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16.h),
                     TextFormField(
                       controller: nameController,
                       decoration: const InputDecoration(
@@ -73,7 +74,7 @@ class AddEditProductScreenLarge extends StatelessWidget {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16.h),
                     Row(
                       children: [
                         Expanded(
@@ -94,10 +95,10 @@ class AddEditProductScreenLarge extends StatelessWidget {
                             onChanged: onCategoryChanged,
                           ),
                         ),
-                        const SizedBox(width: 16),
+                        SizedBox(width: 16.w),
                         Expanded(
                           child: DropdownButtonFormField<String>(
-                            value: selectedUnit,
+                            initialValue: selectedUnit,
                             decoration: const InputDecoration(
                               labelText: 'Unit',
                               prefixIcon: Icon(Icons.straighten_rounded),
@@ -113,7 +114,7 @@ class AddEditProductScreenLarge extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16.h),
                     TextFormField(
                       controller: descriptionController,
                       decoration: const InputDecoration(
@@ -126,10 +127,10 @@ class AddEditProductScreenLarge extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             Card(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(16.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -139,7 +140,7 @@ class AddEditProductScreenLarge extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16.h),
                     TextFormField(
                       controller: quantityController,
                       decoration: const InputDecoration(
@@ -158,7 +159,7 @@ class AddEditProductScreenLarge extends StatelessWidget {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16.h),
                     Row(
                       children: [
                         Expanded(
@@ -182,7 +183,7 @@ class AddEditProductScreenLarge extends StatelessWidget {
                             },
                           ),
                         ),
-                        const SizedBox(width: 16),
+                        SizedBox(width: 16.w),
                         Expanded(
                           child: TextFormField(
                             controller: sellingPriceController,
@@ -210,10 +211,10 @@ class AddEditProductScreenLarge extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             Card(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(16.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -223,7 +224,7 @@ class AddEditProductScreenLarge extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8.h),
                     SwitchListTile(
                       title: const Text('Show in Billing Screen'),
                       subtitle: const Text('Enable this product for billing'),
@@ -234,16 +235,16 @@ class AddEditProductScreenLarge extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: isLoading ? null : onSave,
                 child: isLoading
-                    ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
+                    ? SizedBox(
+                        width: 24.w,
+                        height: 24.h,
+                        child: const CircularProgressIndicator(
                           strokeWidth: 2,
                           color: Colors.white,
                         ),
